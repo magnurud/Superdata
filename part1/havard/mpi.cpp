@@ -18,6 +18,7 @@ double doVsumMPI(size_t n, int size, int rank);
 //------------------------------------------------------------------------------
 int main(int argc, char** argv){
 	int rank, size;
+	cout.precision(16);
 
 	MPI_Init(&argc, &argv);
 	MPI_Comm_size(MPI_COMM_WORLD, &size);

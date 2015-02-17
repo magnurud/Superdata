@@ -23,6 +23,7 @@ double doVsumOpenMP(size_t n);
 //------------------------------------------------------------------------------
 int main(int argc, char** argv){
 	double start, stop;
+	cout.precision(16);
 
 	// Serial
 	start = omp_get_wtime();
