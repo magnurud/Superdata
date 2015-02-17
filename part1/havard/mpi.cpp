@@ -55,7 +55,7 @@ int main(int argc, char** argv){
 double doVsumMPI(size_t n, int size, int rank){
 	int h = n/size;
 
-	if ((n%(2*size)) > 0){
+	if ((n%(size)) > 0){
 		cout << "Need to fix this... " << endl;
 		MPI_Finalize();
 		return -1;
