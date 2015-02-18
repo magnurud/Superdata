@@ -75,6 +75,7 @@ double doVsumMPI(size_t n, int size, int rank){
 	MPI_Scatter(&v_all.front(), h, MPI_DOUBLE, &v.front(), h, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
 	double loc_sum = 0;
+#pragma omp parallel for schedule(static) reduction(+:loc_sum)
 	for (size_t i = 0; i < v.size(); ++i) {
 		loc_sum += v[i];
 	}
