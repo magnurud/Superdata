@@ -31,7 +31,7 @@ int main(int argc, char** argv){
 
 	const size_t N = 12;
 	for (size_t i = 0; i < N; ++i) {
-		double sum = doVsumMPI(pow(2,i+3), size, rank);
+		double sum = doVsumMPI(pow((double)2,i+3), size, rank);
 		if (rank == 0){
 			cout << i+3 << "\t";
 			cout <<  pow(M_PI, 2)/6.0 - sum << endl;
@@ -67,7 +67,7 @@ double doVsumMPI(size_t n, int size, int rank){
 		// Create vector v
 		v_all = Vec(n);
 		for (size_t i = 0; i < v_all.size(); ++i) {
-			v_all[i] = 1.0/pow((i+1), 2);
+			v_all[i] = 1.0/pow((double)(i+1), 2);
 		}
 	}
 
