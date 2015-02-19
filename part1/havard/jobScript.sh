@@ -4,7 +4,7 @@
 #PBS -N Project1
 
 # set the number of nodes and processes per node
-#PBS −l nodes=4:ppn=12:default
+#PBS -l nodes=4:ppn=2:default
 
 # set max wallclock time [h:m:s]
 #PBS -l walltime=00:01:00
