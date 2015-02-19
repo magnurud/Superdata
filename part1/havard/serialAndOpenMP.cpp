@@ -54,13 +54,13 @@ void prob1(){
 
 	for (size_t i = 0; i < N; ++i) {
 		//sum[i] = doVsum(pow(2,i+3));
-		sumReverse[i] = doVsumReverse(pow(2,i+3));
+		sumReverse[i] = doVsumReverse(pow((double)2,(double)i+3));
 	}
 
 	for (size_t i = 0; i < N; ++i) {
 		cout << i+3 << "\t";
 		//cout <<  pow(M_PI, 2)/6.0 - sum[i] << "\t";
-		cout <<  pow(M_PI, 2)/6.0 - sumReverse[i] << endl;
+		cout <<  pow((double)M_PI, (double)2)/6.0 - sumReverse[i] << endl;
 	}
 
 }
@@ -70,7 +70,7 @@ double doVsum(size_t n){
 
 	// Create v = 1/i^2
 	for (size_t i = 0; i < n; ++i) {
-		v[i] = 1.0/pow((i+1), 2);
+		v[i] = 1.0/pow((double)(i+1),(double) 2);
 	}
 
 	// Sum of v
@@ -88,7 +88,7 @@ double doVsumReverse(size_t n){
 
 	// Create v = 1/i^2
 	for (size_t i = 0; i < n; ++i) {
-		v[i] = 1.0/pow((i+1), 2);
+		v[i] = 1.0/pow((double)(i+1), (double)2);
 	}
 
 	// Sum of v
@@ -108,12 +108,12 @@ void prob2(){
 	Vec sum(N);
 
 	for (size_t i = 0; i < N; ++i) {
-		sum[i] = doVsumOpenMP(pow(2,i+3));
+		sum[i] = doVsumOpenMP(pow((double)2,(double)i+3));
 	}
 
 	for (size_t i = 0; i < N; ++i) {
 		cout << i+3 << "\t";
-		cout <<  pow(M_PI, 2)/6.0 - sum[i] << endl;
+		cout <<  pow((double)M_PI, (double)2)/6.0 - sum[i] << endl;
 	}
 
 }
@@ -125,7 +125,7 @@ double doVsumOpenMP(size_t n){
 	// They write to different places so no need for protection.
 //#pragma omp parallel for schedule(static)
 	for (size_t i = 0; i < n; ++i) {
-		v[i] = 1.0/pow((i+1), 2);
+		v[i] = 1.0/pow((double)(i+1), 2(double));
 	}
 
 	// Sum of v
