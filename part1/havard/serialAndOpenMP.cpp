@@ -125,7 +125,7 @@ double doVsumOpenMP(size_t n){
 	// They write to different places so no need for protection.
 //#pragma omp parallel for schedule(static)
 	for (size_t i = 0; i < n; ++i) {
-		v[i] = 1.0/pow((double)(i+1), 2(double));
+		v[i] = 1.0/pow((double)(i+1), (double)2);
 	}
 
 	// Sum of v
