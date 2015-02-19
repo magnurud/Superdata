@@ -15,8 +15,8 @@ list(APPEND CMAKE_CXX_FLAGS ${OpenMP_CXX_FLAGS})
 # -Wpendantic gives warnings form the mpi library, so not added
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
-add_executable(serialAndOpenMP serialAndOpenMP.cpp)
-#target_link_libraries(serial ${MPI_CXX_LIBRARIES})
+add_executable(serial serial.cpp)
+add_executable(openMP openMP.cpp)
 
 add_executable(mpi mpi.cpp)
 target_link_libraries(mpi ${MPI_CXX_LIBRARIES})
