@@ -53,6 +53,7 @@ add_library(common fst.f)
 
 # Temporary test program
 add_executable(temp temp.cpp)
+target_link_libraries(temp ${DEPLIBS_CXX})
 
 # The C++ based poisson application
 add_executable(poisson poisson.cpp)

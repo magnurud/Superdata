@@ -26,6 +26,20 @@ class Matrix {
      size_t m_rows; 		//!< Number of rows in matrix
      size_t m_cols; 		//!< Number of columns in matrix
      std::vector<scalar> m_data; //!< The actual data
+
+     // transpose sub matrix m_cols x m_cols
+     void transposeSub(size_t rowStart) {
+         size_t r, r2, c2;
+         for (size_t c = 0; c < m_cols; ++c) {
+             r = rowStart + c + 1;
+             r2 = c + rowStart;
+             for (size_t j = c+1; j < m_cols; ++j) {
+                 c2 = r-rowStart;
+                 swap(r, c, r2, c2); 
+                 r++;
+             }
+         }
+     }
  public:
      //! \brief Constructor
      //! \param rows Number of rows in matrix
@@ -68,6 +82,16 @@ class Matrix {
              out.precision(oldprec);
      }
 
+     // returns pointer to first element in column j
+     scalar* colFront(size_t j) {
+         if (order == RowMajor)
+             exit(1);
+         else
+             return &m_data[j*m_rows];
+             //return (*this)(0, j);
+     }
+
+
      // swap elemts
      inline void swap(size_t r1, size_t c1, size_t r2, size_t c2) {
          scalar tmp = (*this)(r1, c1);
@@ -75,40 +99,49 @@ class Matrix {
          (*this)(r2, c2) = tmp;
      }
 
-     // finds next index for "transpose"
-     inline void nextIxTrans(size_t i, size_t j, size_t &ii, size_t &jj) {
-         ii = m_cols*j + i/m_cols;
-         jj = i % m_cols;
-     }
-
-     void mkTransposed() {
-         if (order == RowMajor)
-             exit(1);
-
-         size_t ii, jj, kk, r0, c0, r1, c1, r2, c2;
-         ii = 0;
-         scalar tmp1, tmp2;
-         for (size_t i = m_cols; i > 1; --i) {
-             jj = ii-1;
-             ii++;
-             for (size_t j = 0; j < i; ++j) {
-                 jj++;
-                 kk = ii;
-                 for (size_t k = 0; k < (i-1); ++k) {
-                     // index = (kk + jj*m_cols, ii-1)
-                     r0 = kk + jj*m_cols;
-                     c0 = ii - 1;
-                     nextIxTrans(r0, c0, r1, c1);
-                     nextIxTrans(r1, c1, r2, c2);
-                     tmp1 = (*this)(r1, c1);
-                     tmp2 = (*this)(r2, c2);
-                     (*this)(r1, c1) = (*this)(r0, c0);
-                     (*this)(r2, c2) = tmp1;
-                     (*this)(r0, c0) = tmp2;
-                     kk++;
-                     cout << r0 << ", " << c0 << endl;
-                 }
-             }
+     void transposeAllSubs() {
+         size_t rowStart = 0;
+         for (size_t i = 0; i < m_cols; ++i) {
+             this->transposeSub(rowStart);
+             rowStart += m_cols;
          }
      }
+
+     //// finds next index for "transpose"
+     //inline void nextIxTrans(size_t i, size_t j, size_t &ii, size_t &jj) {
+         //ii = m_cols*j + i/m_cols;
+         //jj = i % m_cols;
+     //}
+
+
+     //void mkTransposed() {
+         //if (order == RowMajor)
+             //exit(1);
+
+         //size_t ii, jj, kk, r0, c0, r1, c1, r2, c2;
+         //ii = 0;
+         //scalar tmp1, tmp2;
+         //for (size_t i = m_cols; i > 1; --i) {
+             //jj = ii-1;
+             //ii++;
+             //for (size_t j = 0; j < i; ++j) {
+                 //jj++;
+                 //kk = ii;
+                 //for (size_t k = 0; k < (i-1); ++k) {
+                     //// index = (kk + jj*m_cols, ii-1)
+                     //r0 = kk + jj*m_cols;
+                     //c0 = ii - 1;
+                     //nextIxTrans(r0, c0, r1, c1);
+                     //nextIxTrans(r1, c1, r2, c2);
+                     //tmp1 = (*this)(r1, c1);
+                     //tmp2 = (*this)(r2, c2);
+                     //(*this)(r1, c1) = (*this)(r0, c0);
+                     //(*this)(r2, c2) = tmp1;
+                     //(*this)(r0, c0) = tmp2;
+                     //kk++;
+                     ////cout << r0 << ", " << c0 << endl;
+                 //}
+             //}
+         //}
+     //}
 };
