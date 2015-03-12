@@ -199,3 +199,17 @@ class MatrixMPI: public Matrix<scalar, order>{
 
 
 };
+
+// Create and commit MPI datatypes
+void create_types(MPI_Datatype* newtype, int block_count, int block_length, int stride){
+    //For coloumns that neighbour other processes
+    MPI_Type_vector(block_count, block_length, stride, MPI_UNSIGNED_CHAR, newtype);
+    //Commit the above
+    MPI_Type_commit(newtype);
+}
+
+
+
+
+
+
