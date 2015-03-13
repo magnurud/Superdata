@@ -27,22 +27,24 @@ int main(int argc, char** argv) {
     MPI_Comm_dup(MPI_COMM_WORLD, &WorldComm);
 
     size_t N = atoi(argv[1]); // Dimensions of total matrix
-    if (N%size) {
-        cout << "Need nr proc to be multiple of columns" << endl;
+    if (!(N%2)) {
+        cout << "Need N to be odd" << endl;
         MPI_Finalize();
         return -1;
     }
-    size_t cols = N/size;  //local cols
-    size_t rows = N;
 
 
-    MatrixMPI<double, ColMajor> A(rows, cols, WorldComm);
+    MatrixMPI<double, ColMajor> A(N, WorldComm);
 
     // Fill matix column wise 1,2,3,...
-    int a = 0 + rank*rows*cols;
-    for (size_t j = 0; j < cols; ++j) {
-        for (size_t i = 0; i < rows; ++i) {
-            A(i, j) = a++;
+    vector<size_t> cols = A.getCols_all();
+    int val = 0;// + rank*rows*cols;
+    for (size_t i = 0; i < (size_t)rank; ++i) {
+        val += cols[i]*A.getrows();
+    }
+    for (size_t j = 0; j < A.getcols(); ++j) {
+        for (size_t i = 0; i < A.getrows(); ++i) {
+            A(i, j) = val++;
         }
     }
 
@@ -51,10 +53,21 @@ int main(int argc, char** argv) {
         A.print();
     }
 
-    // Restructure to get actual transpose
-    A.transpose();
+    A.trans();
     
+    MPI_Barrier(WorldComm);
     if (rank == 0) {
+        cout << "After" << endl;
+        A.print();
+    }
+
+    MPI_Barrier(WorldComm);
+    if (rank == 1) {
+        cout << "After" << endl;
+        A.print();
+    }
+    MPI_Barrier(WorldComm);
+    if (rank == 2) {
         cout << "After" << endl;
         A.print();
     }
