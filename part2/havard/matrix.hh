@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 #include <mpi.h>
+using namespace std;
 
 //! \brief Enum for data layout in memory
 enum DataOrder {
@@ -169,121 +170,75 @@ class MatrixMPI: public Matrix<scalar, order>{
 
      
      void trans() {
-         // METHOD 1
-         //----------------------------------------------------------------
-         //Sending to get transpose
-         //for (size_t i = 0; i < this->m_cols; ++i) {
-             //MPI_Alltoall(this->colFront(i), this->m_cols, MPI_DOUBLE, 
-                     //this->colFront(i), this->m_cols, MPI_DOUBLE, 
-                     //m_comm);
-         //}
-         //----------------------------------------------------------------
-         
-         
-         // METHOD 2
-         //----------------------------------------------------------------
-         //int* sendcnts = new int[m_commSize];
-         //for (size_t i = 0; i < m_commSize; ++i) {
-             //sendcnts[i] = this->m_cols;
-         //}
-         //int* senddisps = new int[m_commSize];
-         //for (size_t i = 0; i < m_commSize; ++i) {
-             //senddisps[i] = this->m_cols*i;
-         //}
-         
-         //MatrixMPI<double, ColMajor> temp(this->m_rows, this->m_cols, m_comm);
-         //for (size_t i = 0; i < this->m_cols; ++i) {
-         ////for (size_t i = 0; i < 1; ++i) {
-             //MPI_Alltoallv(this->colFront(i), sendcnts, senddisps, MPI_DOUBLE, 
-                     //temp.colFront(i), sendcnts, senddisps, MPI_DOUBLE, 
-                     //m_comm);
-         //}
-         //delete [] sendcnts;
-         //sendcnts = nullptr;
-         //delete [] senddisps;
-         //senddisps = nullptr;
-
-         //// Horribly memory usage
-         //for (size_t j = 0; j < this->m_cols; ++j) {
-             //for (size_t i = 0; i < this->m_rows; ++i) {
-                 //(*this)(i,j) = temp(i,j);
-             //}
-         //}
-         //----------------------------------------------------------------
-
-
-         // METHOD 3
-         //----------------------------------------------------------------
-         // Create data type
-         //MPI_Datatype collect_t, collect;
-         MPI_Datatype collect;
-         //create_types(&collect, this->m_cols, this->m_cols, this->m_rows);
-         //create_types(&collect, 2, this->m_cols, this->m_rows);
-         //create_types(&collect, 1, this->m_cols, this->m_cols);
-         create_types(&collect, this->m_cols, this->m_cols, this->m_rows, this->m_cols*sizeof(double));
-         //create_types(&collect_t, this->m_cols, this->m_cols, this->m_rows);
-         //MPI_Type_create_resized(collect_t, 0, 
-                 //this->m_cols*sizeof(double), &collect); 
-         //MPI_Type_free(&collect_t);
-         //MPI_Type_commit(&collect);
-
+         // Create data type cosisting of one local row
+         MPI_Datatype locrow;
+         create_types(&locrow, this->m_cols, 1, this->m_rows, sizeof(double));
 
          int* sendcnts = new int[m_commSize];
          for (size_t i = 0; i < m_commSize; ++i) {
-             //sendcnts[i] = this->m_cols;
-             sendcnts[i] = 1;
+             sendcnts[i] = m_cols_all[i];
          }
-         int* senddisps = new int[m_commSize];
-         for (size_t i = 0; i < m_commSize; ++i) {
-             senddisps[i] = i;
-         }
-         int* recvdisps = new int[m_commSize];
-         for (size_t i = 0; i < m_commSize; ++i) {
-             recvdisps[i] = i;
+         int* senddisps = new int[m_commSize]();
+         for (size_t i = 1; i < m_commSize; ++i) {
+             senddisps[i] = senddisps[i-1] + sendcnts[i-1];
          }
 
-         //MPI_Datatype collectRecv;
-         //create_types(&collectRecv, 2, this->m_cols, this->m_cols);
+         int* recvdisps = new int[m_commSize];
+         for (size_t i = 0; i < m_commSize; ++i) {
+             recvdisps[i] = senddisps[i];
+         }
+
          
          MatrixMPI<double, ColMajor> temp(this->m_rows, m_comm);
 
-         MPI_Alltoallv(this->colFront(0), sendcnts, senddisps, collect, 
-                 //temp.colFront(0), sendcnts, recvdisps, collectRecv, 
-                 temp.colFront(0), sendcnts, recvdisps, collect, 
+         MPI_Alltoallv(this->colFront(0), sendcnts, senddisps, locrow, 
+                 temp.colFront(0), sendcnts, recvdisps, locrow, 
                  m_comm);
-         //for (size_t i = 0; i < this->m_cols; ++i) {
-             //MPI_Alltoallv(this->colFront(i), sendcnts, senddisps, collect, 
-                     //temp.colFront(i), sendcnts, recvdisps, collect, 
-                     //m_comm);
-         //}
 
          delete [] sendcnts;
          sendcnts = nullptr;
          delete [] senddisps;
          senddisps = nullptr;
 
+         MPI_Barrier(m_comm);
+         if (m_commRank == 0) {
+             cout << "Temp 0" << endl;
+             temp.print();
+         }
+
+         
+         // Does not work and is horrible anyways...
+         //size_t r, r2, c2;
+         //size_t rstart = 0;
+         //// For each sub submatrix
+         //for (size_t k = 0; k < m_commSize; ++k) {
+             //rstart += senddisps[k];
+             //r = rstart;
+             //r2 = r;
+             //c2 = 0;
+             //for (size_t i = 0; i < m_cols_all[k]; ++i) {
+                 //// iterate over cols in block
+                 //for (size_t c = 0; c < this->m_cols; ++c) {
+                     //// iterate over rows in local block
+                     //(*this)(r2,c2) = temp(r,c);
+                     //r2++; // Does not work
+                     //if (r2 == rstart + senddisps[k+1]) {
+                         //r2 = rstart;
+                         //c2++;
+                     //}
+                 //}
+                 //r++;
+             //}
+         //}
+
+         //MPI_Barrier(m_comm);
          //if (m_commRank == 0) {
-             //cout << "temp" << endl;
+             //cout << "Temp 0" << endl;
              //temp.print();
          //}
 
-         // Horribly memory usage
-         for (size_t j = 0; j < this->m_cols; ++j) {
-             for (size_t i = 0; i < this->m_rows; ++i) {
-                 (*this)(i,j) = temp(i,j);
-             }
-         }
-
-
-         //----------------------------------------------------------------
          
 
-         // Restructuring to get transposed
-         size_t rowStart = 0;
-         for (size_t i = 0; i < m_commSize; ++i) { 
-             this->transposeSub(rowStart);
-             rowStart += this->m_cols;
-         }
      }
 
 
@@ -348,14 +303,6 @@ class MatrixMPI: public Matrix<scalar, order>{
 };
 
 // Create and commit MPI datatypes
-//void create_types(MPI_Datatype* newtype, int block_count, int block_length, int stride){
-    ////For coloumns that neighbour other processes
-    //MPI_Type_vector(block_count, block_length, stride, MPI_DOUBLE, newtype);
-    ////Commit the above
-    //MPI_Type_commit(newtype);
-//}
-
-
 void create_types(MPI_Datatype* newtype, int block_count, int block_length, int stride, MPI_Aint extent){
     MPI_Datatype tmp;
     //Create new datatype
