@@ -124,10 +124,39 @@ class Matrix {
 template<typename scalar, DataOrder order=RowMajor>
 class MatrixMPI: public Matrix<scalar, order>{
  private:
+     // Variables
      int m_commSize;                    //!< Size of communicator
      int m_commRank;                    //!< Rank in communicator
      MPI_Comm &m_comm;                  //!< Communicator
      std::vector<size_t> m_cols_all;    //!< Vector containing all local columns
+     //-----------------------------------------------------------
+     // Functions
+     //! \brief Copy blocks from temp to this, and order by col instead of row
+     //! \param temp Temporary MatrixMPI receive buffer
+     //! \param senddisps Send displacements array (for MPI_Alltoallv)
+     void copyBlocksByRowToCol(MatrixMPI &temp, vector<int> senddisps){
+         size_t rowStart, nrRowsInBlock, rowNextStart, r, r2, c2;
+         for (size_t k = 0; k < m_commSize; ++k) {
+             rowStart      = senddisps[k];
+             nrRowsInBlock = m_cols_all[k];
+             rowNextStart  = rowStart + nrRowsInBlock;
+             r = rowStart;
+             r2 = r;
+             c2 = 0;
+             // iterate over rows (temp) in local block
+             for (size_t i = 0; i < m_cols_all[k]; ++i) { 
+                 // iterate over cols (temp) in block
+                 for (size_t c = 0; c < this->m_cols; ++c) {
+                     (*this)(r2,c2) = temp(r,c);
+                     r2++;
+                     c2 += r2 / (rowNextStart);
+                     r2 = (r2-rowStart) % nrRowsInBlock + rowStart;
+                 }
+                 r++;
+             }
+         }
+     }
+
  public:
      //! \brief Constructor
      //! \param glob_dim Global dim of quadratic matrix
@@ -150,7 +179,6 @@ class MatrixMPI: public Matrix<scalar, order>{
          this->m_rows = rows;
          this->m_cols = cols;
          this->m_data.resize(this->m_rows * this->m_cols);
-
      }
 
      std::vector<size_t> getCols_all() {
@@ -168,67 +196,31 @@ class MatrixMPI: public Matrix<scalar, order>{
              return &this->m_data[j*this->m_rows];
      }
 
-     
-     void trans() {
+     //! \brief Transpose matrix, but double memory usage
+     void transpose() {
          // Create data type consisting of one local row
          MPI_Datatype locrow;
          create_types(&locrow, this->m_cols, 1, this->m_rows, sizeof(double));
 
-         int* sendcnts = new int[m_commSize];
+         // Create types to MPI_Alltoallv
+         vector<int> sendcnts(m_commSize);
          for (size_t i = 0; i < m_commSize; ++i) {
+             // Need to convert size_t to int
              sendcnts[i] = m_cols_all[i];
          }
-         int* senddisps = new int[m_commSize]();
+         vector<int> senddisps(m_commSize, 0);
          for (size_t i = 1; i < m_commSize; ++i) {
              senddisps[i] = senddisps[i-1] + sendcnts[i-1];
          }
-
-         int* recvdisps = new int[m_commSize];
-         for (size_t i = 0; i < m_commSize; ++i) {
-             recvdisps[i] = senddisps[i];
-         }
-
-         
          MatrixMPI<double, ColMajor> temp(this->m_rows, m_comm);
+         MPI_Alltoallv(&this->m_data[0], &sendcnts.front(), 
+                 &senddisps.front(), locrow, &temp.m_data[0], 
+                 &sendcnts.front(), &senddisps.front(), locrow, m_comm);
 
-         MPI_Alltoallv(this->colFront(0), sendcnts, senddisps, locrow, 
-                 temp.colFront(0), sendcnts, recvdisps, locrow, 
-                 m_comm);
+         // Reorder blocks to get transpose
+         this->copyBlocksByRowToCol(temp, senddisps);
 
-
-         // Horribly written...
-         size_t r, r2, c2;
-         size_t rstart = 0;
-         // For each sub submatrix
-         for (size_t k = 0; k < m_commSize; ++k) {
-             rstart = senddisps[k];
-             if (k == 0)
-                 r = rstart;
-             r2 = r;
-             c2 = 0;
-             // iterate over rows in local block
-             for (size_t i = 0; i < m_cols_all[k]; ++i) { 
-                 // iterate over cols in block
-                 for (size_t c = 0; c < this->m_cols; ++c) {
-                     (*this)(r2,c2) = temp(r,c);
-                     r2++;
-                     if (r2 == rstart + m_cols_all[k]) {
-                         r2 = rstart;
-                         c2++;
-                     }
-                 }
-                 r++;
-             }
-         }
-
-         delete [] sendcnts;
-         sendcnts = nullptr;
-         delete [] senddisps;
-         senddisps = nullptr;
          MPI_Type_free(&locrow);
-     }
-
-     void orderBlockByCol(size_t rowstart){
      }
 
 
@@ -261,7 +253,7 @@ class MatrixMPI: public Matrix<scalar, order>{
      }
 
      //! \brief Does transpose using MPI
-     void transpose() {
+     void transposeFist() {
                      
          // New datatype
          //MPI_Datatype MPI_scalar;

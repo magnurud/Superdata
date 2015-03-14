@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
         A.print();
     }
 
-    A.trans();
+    A.transpose();
     
     MPI_Barrier(WorldComm);
     if (rank == 0) {
@@ -70,17 +70,6 @@ int main(int argc, char** argv) {
         cout << "After" << endl;
         A.print();
     }
-
-    //MPI_Barrier(WorldComm);
-    //if (rank == 1) {
-        //cout << "After" << endl;
-        //A.print();
-    //}
-    //MPI_Barrier(WorldComm);
-    //if (rank == 2) {
-        //cout << "After" << endl;
-        //A.print();
-    //}
 
     MPI_Comm_free(&WorldComm);
 	MPI_Finalize();
