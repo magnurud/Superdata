@@ -55,11 +55,21 @@ int main(int argc, char** argv) {
 
     A.trans();
     
-    //MPI_Barrier(WorldComm);
-    //if (rank == 0) {
-        //cout << "After" << endl;
-        //A.print();
-    //}
+    MPI_Barrier(WorldComm);
+    if (rank == 0) {
+        cout << "After" << endl;
+        A.print();
+    }
+    MPI_Barrier(WorldComm);
+    if (rank == 1) {
+        cout << "After" << endl;
+        A.print();
+    }
+    MPI_Barrier(WorldComm);
+    if (rank == 2) {
+        cout << "After" << endl;
+        A.print();
+    }
 
     //MPI_Barrier(WorldComm);
     //if (rank == 1) {

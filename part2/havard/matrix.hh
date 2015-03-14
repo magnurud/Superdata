@@ -170,7 +170,7 @@ class MatrixMPI: public Matrix<scalar, order>{
 
      
      void trans() {
-         // Create data type cosisting of one local row
+         // Create data type consisting of one local row
          MPI_Datatype locrow;
          create_types(&locrow, this->m_cols, 1, this->m_rows, sizeof(double));
 
@@ -195,52 +195,41 @@ class MatrixMPI: public Matrix<scalar, order>{
                  temp.colFront(0), sendcnts, recvdisps, locrow, 
                  m_comm);
 
+
+         // Horribly written...
+         size_t r, r2, c2;
+         size_t rstart = 0;
+         // For each sub submatrix
+         for (size_t k = 0; k < m_commSize; ++k) {
+             rstart = senddisps[k];
+             if (k == 0)
+                 r = rstart;
+             r2 = r;
+             c2 = 0;
+             // iterate over rows in local block
+             for (size_t i = 0; i < m_cols_all[k]; ++i) { 
+                 // iterate over cols in block
+                 for (size_t c = 0; c < this->m_cols; ++c) {
+                     (*this)(r2,c2) = temp(r,c);
+                     r2++;
+                     if (r2 == rstart + m_cols_all[k]) {
+                         r2 = rstart;
+                         c2++;
+                     }
+                 }
+                 r++;
+             }
+         }
+
          delete [] sendcnts;
          sendcnts = nullptr;
          delete [] senddisps;
          senddisps = nullptr;
-
-         MPI_Barrier(m_comm);
-         if (m_commRank == 0) {
-             cout << "Temp 0" << endl;
-             temp.print();
-         }
-
-         
-         // Does not work and is horrible anyways...
-         //size_t r, r2, c2;
-         //size_t rstart = 0;
-         //// For each sub submatrix
-         //for (size_t k = 0; k < m_commSize; ++k) {
-             //rstart += senddisps[k];
-             //r = rstart;
-             //r2 = r;
-             //c2 = 0;
-             //for (size_t i = 0; i < m_cols_all[k]; ++i) {
-                 //// iterate over cols in block
-                 //for (size_t c = 0; c < this->m_cols; ++c) {
-                     //// iterate over rows in local block
-                     //(*this)(r2,c2) = temp(r,c);
-                     //r2++; // Does not work
-                     //if (r2 == rstart + senddisps[k+1]) {
-                         //r2 = rstart;
-                         //c2++;
-                     //}
-                 //}
-                 //r++;
-             //}
-         //}
-
-         //MPI_Barrier(m_comm);
-         //if (m_commRank == 0) {
-             //cout << "Temp 0" << endl;
-             //temp.print();
-         //}
-
-         
-
+         MPI_Type_free(&locrow);
      }
 
+     void orderBlockByCol(size_t rowstart){
+     }
 
 
 
