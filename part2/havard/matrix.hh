@@ -9,6 +9,8 @@
 #include <iostream>
 #include <vector>
 #include <mpi.h>
+#include <omp.h>
+//#include <unistd.h> // sleep
 using namespace std;
 
 //! \brief Enum for data layout in memory
@@ -71,10 +73,10 @@ class Matrix {
              out.precision(oldprec);
      }
 
-     scalar getrows() {
+     scalar getRows() {
          return m_rows;
      }
-     scalar getcols() {
+     scalar getCols() {
          return m_cols;
      }
 
@@ -187,13 +189,13 @@ class MatrixMPI: public Matrix<scalar, order>{
 
      //! \brief returns pointer to first element in local column
      //! \param j Local column number
-     scalar* colFront(size_t j) {
+     scalar* colFront(size_t col) {
          if (order == RowMajor) {
              std::cout << "No implementation for RowMajor" << std::endl;
              exit(1);
          } 
          else
-             return &this->m_data[j*this->m_rows];
+             return &this->m_data[col*this->m_rows];
      }
 
      //! \brief Transpose matrix, but double memory usage
@@ -213,73 +215,21 @@ class MatrixMPI: public Matrix<scalar, order>{
              senddisps[i] = senddisps[i-1] + sendcnts[i-1];
          }
          MatrixMPI<double, ColMajor> temp(this->m_rows, m_comm);
+         //cout << "Ready to send" << endl;
          MPI_Alltoallv(&this->m_data[0], &sendcnts.front(), 
                  &senddisps.front(), locrow, &temp.m_data[0], 
                  &sendcnts.front(), &senddisps.front(), locrow, m_comm);
 
+         //cout << "Ready to reorder" << endl;
+         //if (m_commRank == 0) {
+             //temp.print();
+         //}
          // Reorder blocks to get transpose
          this->copyBlocksByRowToCol(temp, senddisps);
+         //cout << "Done reordering" << endl;
 
          MPI_Type_free(&locrow);
      }
-
-
-
-
-     //! \brief transpose sub matrix m_cols x m_cols
-     //! \param rowStart Upper left element in submatrix
-     void transposeSub(size_t rowStart) {
-         size_t r, r2, c2;
-         for (size_t c = 0; c < this->m_cols; ++c) {
-             r = rowStart + c + 1;
-             r2 = c + rowStart;
-             for (size_t j = c+1; j < this->m_cols; ++j) {
-                 c2 = r-rowStart;
-                 swap(r, c, r2, c2); 
-                 r++;
-             }
-         }
-     }
-
-     //! \brief swap elemts in matrix
-     //! \param r1 Row 1 index
-     //! \param c1 Col 1 index
-     //! \param r2 Row 2 index
-     //! \param c2 Col 2 index
-     inline void swap(size_t r1, size_t c1, size_t r2, size_t c2) {
-         scalar tmp = (*this)(r1, c1);
-         (*this)(r1, c1) = (*this)(r2, c2);
-         (*this)(r2, c2) = tmp;
-     }
-
-     //! \brief Does transpose using MPI
-     void transposeFist() {
-                     
-         // New datatype
-         //MPI_Datatype MPI_scalar;
-         //MPI_Type_create_resized(MPI_INT, 0, sizeof(scalar), &MPI_scalar);
-         //MPI_Type_commit(&MPI_scalar);
-
-         //Sending to get transpose
-         for (size_t i = 0; i < this->m_cols; ++i) {
-             //MPI_Alltoall(this->colFront(i), this->m_cols, MPI_DOUBLE, 
-                     //this->colFront(i), this->m_cols, MPI_DOUBLE, 
-                     //MPI_COMM_WORLD);
-             //MPI_Alltoall(this->colFront(i), this->m_cols, MPI_scalar, 
-                     //this->colFront(i), this->m_cols, MPI_scalar, 
-                     //m_comm);
-             MPI_Alltoall(this->colFront(i), this->m_cols, MPI_DOUBLE, 
-                     this->colFront(i), this->m_cols, MPI_DOUBLE, 
-                     m_comm);
-         }
-         // Restructuring to get transposed
-         size_t rowStart = 0;
-         for (size_t i = 0; i < m_commSize; ++i) { 
-             this->transposeSub(rowStart);
-             rowStart += this->m_cols;
-         }
-     }
-
 
 };
 
@@ -296,5 +246,8 @@ void create_types(MPI_Datatype* newtype, int block_count, int block_length, int 
 }
 
 
+double WallTime () {
+    return omp_get_wtime();
+}
 
 

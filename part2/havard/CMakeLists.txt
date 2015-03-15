@@ -51,9 +51,11 @@ include_directories(${INCLUDES})
 # Add a library with common sources
 add_library(common fst.f)
 
+#--------------------------------------------
 # Temporary test program
 add_executable(temp temp.cpp)
 target_link_libraries(temp ${DEPLIBS_CXX})
+#--------------------------------------------
 
 # The C++ based poisson application
 add_executable(poisson poisson.cpp)
@@ -63,3 +65,13 @@ target_link_libraries(poisson common ${DEPLIBS_CXX})
 
 # We want to link this as a C++ program
 set_target_properties(poisson PROPERTIES LINKER_LANGUAGE CXX)
+
+#--------------------------------------------
+# Serial code
+add_executable(poissonSerial poissonSerial.cpp)
+
+# Link to libraries
+target_link_libraries(poissonSerial common ${DEPLIBS_CXX})
+
+# We want to link this as a C++ program
+set_target_properties(poissonSerial PROPERTIES LINKER_LANGUAGE CXX)

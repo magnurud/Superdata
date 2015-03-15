@@ -3,133 +3,156 @@
   a unit square using one-dimensional eigenvalue decompositions
   and fast sine transforms
 
+  Built on code by
   einar m. ronquist
   ntnu, october 2000
   revised, october 2001
 */
 
-#include <stddef.h>
-#include <stdlib.h>
+//#include <stddef.h>
+//#include <stdlib.h>
 #include <stdio.h>
-#include <memory.h>
-#include <math.h>
+#include <iostream>
+//#include <memory.h>
+//#include <math.h>
+#include <cmath>
+#include <unistd.h>
+#include "matrix.hh"
+using namespace std;
 
-typedef double Real;
+//typedef double Real;
 
 /* function prototypes */
-Real *createRealArray (int n);
-Real **createReal2DArray (int m, int n);
-void transpose (Real **bt, Real **b, int m);
+//double *createRealArray (int n);
+//Real **createReal2DArray (int m, int n);
+//void transpose (Real **bt, Real **b, int m);
 
 extern "C" {
-void fst_(Real *v, int *n, Real *w, int *nn);
-void fstinv_(Real *v, int *n, Real *w, int *nn);
+    //void fst_(Real *v, int *n, Real *w, int *nn);
+    //void fstinv_(Real *v, int *n, Real *w, int *nn);
+    void fst_(double *v, int *n, double *w, int *nn);
+    void fstinv_(double *v, int *n, double *w, int *nn);
 }
 
 
-int main(int argc, char **argv )
-{
-  Real *diag, **b, **bt, *z;
-  Real pi, h, umax;
-  int i, j, n, m, nn;
+int main(int argc, char **argv) {
+    //Real *diag, **b, **bt, *z;
+    //Real pi, h, umax;
+    //int i, j, n, m, nn;
 
-  /* the total number of grid points in each spatial direction is (n+1) */
-  /* the total number of degrees-of-freedom in each spatial direction is (n-1) */
-  /* this version requires n to be a power of 2 */
+    /* the total number of grid points in each spatial direction is (n+1) */
+    /* the total number of degrees-of-freedom in each spatial direction is (n-1) */
+    /* this version requires n to be a power of 2 */
 
- if( argc < 2 ) {
-    printf("need a problem size\n");
-    return 1;
-  }
-
-  n  = atoi(argv[1]);
-  m  = n-1;
-  nn = 4*n;
-
-  diag = createRealArray (m);
-  b    = createReal2DArray (m,m);
-  bt   = createReal2DArray (m,m);
-  z    = createRealArray (nn);
-
-  h    = 1./(Real)n;
-  pi   = 4.*atan(1.);
-
-  for (i=0; i < m; i++) {
-    diag[i] = 2.*(1.-cos((i+1)*pi/(Real)n));
-  }
-  for (j=0; j < m; j++) {
-    for (i=0; i < m; i++) {
-      b[j][i] = h*h;
+    if (argc < 2) {
+        cout << "Need dim N" << endl;
+        exit(1);
     }
-  }
-  for (j=0; j < m; j++) {
-    fst_(b[j], &n, z, &nn);
-  }
 
-  transpose (bt,b,m);
 
-  for (i=0; i < m; i++) {
-    fstinv_(bt[i], &n, z, &nn);
-  }
-  
-  for (j=0; j < m; j++) {
-    for (i=0; i < m; i++) {
-      bt[j][i] = bt[j][i]/(diag[i]+diag[j]);
+    int rank, size;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm WorldComm;
+    MPI_Comm_dup(MPI_COMM_WORLD, &WorldComm);
+
+    double startTime;
+    if (rank == 0)
+        startTime = WallTime();
+
+    size_t N = atoi(argv[1]); // Dimensions of total matrix
+    if (N%2) {
+        cout << "Need N to not be odd" << endl;
+        MPI_Finalize();
+        return -1;
     }
-  }
-  
-  for (i=0; i < m; i++) {
-    fst_(bt[i], &n, z, &nn);
-  }
 
-  transpose (b,bt,m);
+    int n     = atoi(argv[1]);
+    int m     = n-1;
+    int nn    = 4*n;
 
-  for (j=0; j < m; j++) {
-    fstinv_(b[j], &n, z, &nn);
-  }
+    MatrixMPI<double, ColMajor> b(m, WorldComm);
+    int cols = b.getCols();
 
-  umax = 0.0;
-  for (j=0; j < m; j++) {
-    for (i=0; i < m; i++) {
-      if (b[j][i] > umax) umax = b[j][i];
+    //diag = createRealArray (m);
+    vector<double> diag(m);
+    //b    = createReal2DArray (m,m);
+    //bt   = createReal2DArray (m,m);
+    //double* z = createRealArray (nn);
+    vector<double> z(nn);
+
+    double h = 1./(double)n;
+    //pi   = 4.*atan(1.);
+
+    for (int i = 0; i < m; ++i) {
+        diag[i] = 2.*(1.-cos((i+1)*M_PI/(double)n));
     }
-  }
-  printf (" umax = %e \n",umax);
-
-  return 0;
-}
-
-void transpose (Real **bt, Real **b, int m)
-{
-  int i, j;
-  for (j=0; j < m; j++) {
-    for (i=0; i < m; i++) {
-      bt[j][i] = b[i][j];
+    for (int j = 0; j < cols; j++) {
+        for (int i = 0; i < m; ++i) {
+            b(i,j) = h*h;
+        }
     }
-  }
+
+    //-------------------------------
+    //b.transpose();
+    //MPI_Comm_free(&WorldComm);
+	//MPI_Finalize();
+
+    //return 0;
+    //-------------------------------
+
+
+    for (int j = 0; j < cols; ++j) {
+        fst_(b.colFront(j), &n, &z.front(), &nn);
+    }
+
+    //if (rank == 0) {
+        //b.print();
+    //}
+    //transpose (bt,b,m);
+    b.transpose();
+    //sleep(10);
+
+    for (int i = 0; i < cols; ++i) {
+        fstinv_(b.colFront(i), &n, &z.front(), &nn);
+    }
+
+    for (int j = 0; j < cols; ++j) {
+        for (int i = 0; i < m; ++i) {
+            //bt[j][i] = bt[j][i]/(diag[i]+diag[j]);
+            b(i, j) = b(i, j)/(diag[i]+diag[j]);
+        }
+    }
+
+    for (int i = 0; i < cols; ++i) {
+        fst_(b.colFront(i), &n, &z.front(), &nn);
+    }
+
+    //transpose (b,bt,m);
+    b.transpose();
+
+    for (int j = 0; j < cols; j++) {
+        fstinv_(b.colFront(j), &n, &z.front(), &nn);
+    }
+
+    double umax = 0.0;
+    for (int j = 0; j < cols; j++) {
+        for (int i = 0; i < m; i++) {
+            //if (b[j][i] > umax) umax = b[j][i];
+            if (b(i, j) > umax) umax = b(i, j);
+        }
+    }
+    //printf (" umax = %e \n",umax);
+    cout << rank << ": umax = " << umax << endl;
+
+    if (rank == 0)
+        cout << "Time: " << WallTime() - startTime << endl;
+
+    MPI_Comm_free(&WorldComm);
+	MPI_Finalize();
+
+    return 0;
 }
 
-Real *createRealArray (int n)
-{
-  Real *a;
-  int i;
-  a = (Real *)malloc(n*sizeof(Real));
-  for (i=0; i < n; i++) {
-    a[i] = 0.0;
-  }
-  return (a);
-}
 
-Real **createReal2DArray (int n1, int n2)
-{
-  int i, n;
-  Real **a;
-  a    = (Real **)malloc(n1   *sizeof(Real *));
-  a[0] = (Real  *)malloc(n1*n2*sizeof(Real));
-  for (i=1; i < n1; i++) {
-    a[i] = a[i-1] + n2;
-  }
-  n = n1*n2;
-  memset(a[0],0,n*sizeof(Real));
-  return (a);
-}

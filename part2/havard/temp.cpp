@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
     if (!(N%2)) {
         cout << "Need N to be odd" << endl;
         MPI_Finalize();
-        return -1;
+        exit(1);
     }
 
 
@@ -40,10 +40,10 @@ int main(int argc, char** argv) {
     vector<size_t> cols = A.getCols_all();
     int val = 0;// + rank*rows*cols;
     for (size_t i = 0; i < (size_t)rank; ++i) {
-        val += cols[i]*A.getrows();
+        val += cols[i]*A.getRows();
     }
-    for (size_t j = 0; j < A.getcols(); ++j) {
-        for (size_t i = 0; i < A.getrows(); ++i) {
+    for (size_t j = 0; j < A.getCols(); ++j) {
+        for (size_t i = 0; i < A.getRows(); ++i) {
             A(i, j) = val++;
         }
     }
