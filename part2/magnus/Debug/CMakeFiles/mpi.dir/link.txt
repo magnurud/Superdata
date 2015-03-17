@@ -1,0 +1,1 @@
+/usr/bin/c++    -fopenmp    CMakeFiles/mpi.dir/mpi.cpp.o  -o mpi -rdynamic libcommon.a -lmpi_cxx -lmpi -ldl -lhwloc -lgfortran -lquadmath 

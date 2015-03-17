@@ -1,0 +1,2 @@
+/home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles/common.dir
+/home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles/poisson-mpi.dir

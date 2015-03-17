@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/magnus/SD/Superdata/ex6/poisson.c
+stddef.h
+-
+stdlib.h
+-
+stdio.h
+-
+memory.h
+-
+math.h
+-
+

@@ -1,0 +1,2 @@
+/usr/bin/ar cr libcommon.a  CMakeFiles/common.dir/fst.f.o
+/usr/bin/ranlib libcommon.a
