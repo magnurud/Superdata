@@ -136,7 +136,7 @@ class MatrixMPI: public Matrix<scalar, order>{
      //! \brief Copy blocks from temp to this, and order by col instead of row
      //! \param temp Temporary MatrixMPI receive buffer
      //! \param senddisps Send displacements array (for MPI_Alltoallv)
-     void copyBlocksByRowToCol(MatrixMPI &temp, vector<int> senddisps){
+     void copyBlocksByRowToCol(MatrixMPI<double, RowMajor> &temp, vector<int> senddisps){
          size_t rowStart, nrRowsInBlock, rowNextStart, r, r2, c2;
          for (size_t k = 0; k < m_commSize; ++k) {
              rowStart      = senddisps[k];
@@ -191,7 +191,9 @@ class MatrixMPI: public Matrix<scalar, order>{
      //! \param j Local column number
      scalar* colFront(size_t col) {
          if (order == RowMajor) {
-             std::cout << "No implementation for RowMajor" << std::endl;
+             if (col == 0)
+                 return &this->m_data[0];
+             std::cout << "No implementation for RowMajor other than col = 0" << std::endl;
              exit(1);
          } 
          else
@@ -214,11 +216,24 @@ class MatrixMPI: public Matrix<scalar, order>{
          for (size_t i = 1; i < m_commSize; ++i) {
              senddisps[i] = senddisps[i-1] + sendcnts[i-1];
          }
-         MatrixMPI<double, ColMajor> temp(this->m_rows, m_comm);
+
+         // Receive data of type double 
+         vector<int> receivecnts(m_commSize);
+         for (size_t i = 0; i < m_commSize; ++i) {
+             receivecnts[i] = sendcnts[i]*this->m_cols;
+         }
+         vector<int> receivedisps(m_commSize, 0);
+         for (size_t i = 1; i < m_commSize; ++i) {
+             receivedisps[i] = receivedisps[i-1] + receivecnts[i-1];
+         }
+
+         MatrixMPI<double, RowMajor> temp(this->m_rows, m_comm);
          //cout << "Ready to send" << endl;
          MPI_Alltoallv(&this->m_data[0], &sendcnts.front(), 
-                 &senddisps.front(), locrow, &temp.m_data[0], 
-                 &sendcnts.front(), &senddisps.front(), locrow, m_comm);
+                 &senddisps.front(), locrow, temp.colFront(0), 
+                 //&senddisps.front(), locrow, &temp.m_data[0], 
+                 &receivecnts.front(), &receivedisps.front(), MPI_DOUBLE, m_comm);
+                 //&sendcnts.front(), &senddisps.front(), locrow, m_comm);
 
          //cout << "Ready to reorder" << endl;
          //if (m_commRank == 0) {
