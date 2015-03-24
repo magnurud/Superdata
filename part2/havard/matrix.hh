@@ -137,24 +137,17 @@ class MatrixMPI: public Matrix<scalar, order>{
      //! \param temp Temporary MatrixMPI receive buffer
      //! \param senddisps Send displacements array (for MPI_Alltoallv)
      void copyBlocksByRowToCol(MatrixMPI<double, RowMajor> &temp, vector<int> senddisps){
-         size_t rowStart, nrRowsInBlock, rowNextStart, r, r2, c2;
+         double *tempptr = temp.colFront(0);
+         size_t tempit = 0;
+         size_t rowStart, rowNextStart;
+         // iterate over block k
          for (size_t k = 0; k < m_commSize; ++k) {
              rowStart      = senddisps[k];
-             nrRowsInBlock = m_cols_all[k];
-             rowNextStart  = rowStart + nrRowsInBlock;
-             r = rowStart;
-             r2 = r;
-             c2 = 0;
-             // iterate over rows (temp) in local block
-             for (size_t i = 0; i < m_cols_all[k]; ++i) { 
-                 // iterate over cols (temp) in block
-                 for (size_t c = 0; c < this->m_cols; ++c) {
-                     (*this)(r2,c2) = temp(r,c);
-                     r2++;
-                     c2 += r2 / (rowNextStart);
-                     r2 = (r2-rowStart) % nrRowsInBlock + rowStart;
+             rowNextStart  = rowStart + m_cols_all[k];
+             for (size_t c = 0; c < this->m_cols; ++c) {
+                 for (size_t r = rowStart; r < rowNextStart; ++r) {
+                     (*this)(r,c) = tempptr[tempit++];
                  }
-                 r++;
              }
          }
      }
@@ -231,14 +224,8 @@ class MatrixMPI: public Matrix<scalar, order>{
          //cout << "Ready to send" << endl;
          MPI_Alltoallv(&this->m_data[0], &sendcnts.front(), 
                  &senddisps.front(), locrow, temp.colFront(0), 
-                 //&senddisps.front(), locrow, &temp.m_data[0], 
                  &receivecnts.front(), &receivedisps.front(), MPI_DOUBLE, m_comm);
-                 //&sendcnts.front(), &senddisps.front(), locrow, m_comm);
 
-         //cout << "Ready to reorder" << endl;
-         //if (m_commRank == 0) {
-             //temp.print();
-         //}
          // Reorder blocks to get transpose
          this->copyBlocksByRowToCol(temp, senddisps);
          //cout << "Done reordering" << endl;
