@@ -80,7 +80,7 @@ int main(int argc, char **argv) {
     //b    = createReal2DArray (m,m);
     //bt   = createReal2DArray (m,m);
     //double* z = createRealArray (nn);
-    vector<double> z(nn);
+    //vector<double> z(nn);
 
     double h = 1./(double)n;
     //pi   = 4.*atan(1.);
@@ -88,7 +88,9 @@ int main(int argc, char **argv) {
     for (int i = 0; i < m; ++i) {
         diag[i] = 2.*(1.-cos((i+1)*M_PI/(double)n));
     }
-    for (int j = 0; j < cols; j++) {
+
+#pragma omp parallel for schedule(static)
+    for (int j = 0; j < cols; ++j) {
         for (int i = 0; i < m; ++i) {
             b(i,j) = h*h;
         }
@@ -103,8 +105,9 @@ int main(int argc, char **argv) {
     //-------------------------------
 
 
-//#pragma omp parallel for schedule(static)
+#pragma omp parallel for schedule(static)
     for (int j = 0; j < cols; ++j) {
+        vector<double> z(nn);
         fst_(b.colFront(j), &n, &z.front(), &nn);
     }
 
@@ -115,26 +118,38 @@ int main(int argc, char **argv) {
     b.transpose();
     //sleep(10);
 
-//#pragma omp parallel for schedule(static)
+#pragma omp parallel for schedule(static)
     for (int i = 0; i < cols; ++i) {
+        vector<double> z(nn);
         fstinv_(b.colFront(i), &n, &z.front(), &nn);
     }
 
+    // Displacement vector
+    int displacement = 0;
+    vector<size_t> colsAll = b.getCols_all();
+    for (size_t i = 0; i < (size_t)rank; ++i) {
+        displacement += colsAll[i];
+    }
+    
+#pragma omp parallel for schedule(static)
     for (int j = 0; j < cols; ++j) {
         for (int i = 0; i < m; ++i) {
-            //bt[j][i] = bt[j][i]/(diag[i]+diag[j]);
-            b(i, j) = b(i, j)/(diag[i]+diag[j]);
+            b(i, j) = b(i, j)/(diag[i]+diag[j + displacement]);
         }
     }
 
+#pragma omp parallel for schedule(static)
     for (int i = 0; i < cols; ++i) {
+        vector<double> z(nn);
         fst_(b.colFront(i), &n, &z.front(), &nn);
     }
 
     //transpose (b,bt,m);
     b.transpose();
 
+#pragma omp parallel for schedule(static)
     for (int j = 0; j < cols; j++) {
+        vector<double> z(nn);
         fstinv_(b.colFront(j), &n, &z.front(), &nn);
     }
 

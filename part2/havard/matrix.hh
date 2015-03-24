@@ -100,12 +100,14 @@ class MatrixMPI: public Matrix<scalar, order>{
      //! \param senddisps Send displacements array (for MPI_Alltoallv)
      void copyBlocksByRowToCol(MatrixMPI<double, RowMajor> &temp, vector<int> senddisps){
          double *tempptr = temp.colFront(0);
-         size_t tempit = 0;
-         size_t rowStart, rowNextStart;
+         //size_t tempit = 0;
+         //size_t rowStart, rowNextStart;
          // iterate over block k
+#pragma omp parallel for schedule(static)
          for (size_t k = 0; k < m_commSize; ++k) {
-             rowStart      = senddisps[k];
-             rowNextStart  = rowStart + m_cols_all[k];
+             size_t rowStart     = senddisps[k];
+             size_t rowNextStart = rowStart + m_cols_all[k];
+             size_t tempit       = this->m_cols * rowStart;
              for (size_t c = 0; c < this->m_cols; ++c) {
                  for (size_t r = rowStart; r < rowNextStart; ++r) {
                      (*this)(r,c) = tempptr[tempit++];
