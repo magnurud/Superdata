@@ -4,7 +4,7 @@ SET(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 SET(CMAKE_DEPENDS_CHECK_C
-  "/home/magnus/SD/Superdata/part2/magnus/poisson-mpi.c" "/home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles/poisson-mpi.dir/poisson-mpi.c.o"
+  "/home/birkeland/havakv/Superdata/part2/magnus/poisson-mpi.c" "/home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles/poisson-mpi.dir/poisson-mpi.c.o"
   )
 SET(CMAKE_C_COMPILER_ID "GNU")
 
@@ -16,7 +16,7 @@ SET(CMAKE_TARGET_DEFINITIONS
 
 # Targets to which this target links.
 SET(CMAKE_TARGET_LINKED_INFO_FILES
-  "/home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles/common.dir/DependInfo.cmake"
+  "/home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles/common.dir/DependInfo.cmake"
   )
 
 # The include file search paths:

@@ -4,7 +4,7 @@ SET(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 SET(CMAKE_DEPENDS_CHECK_Fortran
-  "/home/magnus/SD/Superdata/part2/magnus/fst.f" "/home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles/common.dir/fst.f.o"
+  "/home/birkeland/havakv/Superdata/part2/magnus/fst.f" "/home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles/common.dir/fst.f.o"
   )
 SET(CMAKE_Fortran_COMPILER_ID "GNU")
 

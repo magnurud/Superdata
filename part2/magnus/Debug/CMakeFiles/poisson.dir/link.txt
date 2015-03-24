@@ -1,1 +1,0 @@
-/usr/bin/cc   -fopenmp    CMakeFiles/poisson.dir/poisson.c.o  -o poisson -rdynamic -lmpi -ldl -lhwloc -lmpi -ldl -lhwloc 

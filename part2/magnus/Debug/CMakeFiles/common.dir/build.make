@@ -35,10 +35,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/magnus/SD/Superdata/part2/magnus
+CMAKE_SOURCE_DIR = /home/birkeland/havakv/Superdata/part2/magnus
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/magnus/SD/Superdata/part2/magnus/Debug
+CMAKE_BINARY_DIR = /home/birkeland/havakv/Superdata/part2/magnus/Debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/common.dir/depend.make
@@ -51,9 +51,9 @@ include CMakeFiles/common.dir/flags.make
 
 CMakeFiles/common.dir/fst.f.o: CMakeFiles/common.dir/flags.make
 CMakeFiles/common.dir/fst.f.o: ../fst.f
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building Fortran object CMakeFiles/common.dir/fst.f.o"
-	/usr/bin/gfortran  $(Fortran_DEFINES) $(Fortran_FLAGS) -c /home/magnus/SD/Superdata/part2/magnus/fst.f -o CMakeFiles/common.dir/fst.f.o
+	/usr/bin/gfortran  $(Fortran_DEFINES) $(Fortran_FLAGS) -c /home/birkeland/havakv/Superdata/part2/magnus/fst.f -o CMakeFiles/common.dir/fst.f.o
 
 CMakeFiles/common.dir/fst.f.o.requires:
 .PHONY : CMakeFiles/common.dir/fst.f.o.requires
@@ -90,6 +90,6 @@ CMakeFiles/common.dir/clean:
 .PHONY : CMakeFiles/common.dir/clean
 
 CMakeFiles/common.dir/depend:
-	cd /home/magnus/SD/Superdata/part2/magnus/Debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/magnus/SD/Superdata/part2/magnus /home/magnus/SD/Superdata/part2/magnus /home/magnus/SD/Superdata/part2/magnus/Debug /home/magnus/SD/Superdata/part2/magnus/Debug /home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles/common.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/birkeland/havakv/Superdata/part2/magnus/Debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/birkeland/havakv/Superdata/part2/magnus /home/birkeland/havakv/Superdata/part2/magnus /home/birkeland/havakv/Superdata/part2/magnus/Debug /home/birkeland/havakv/Superdata/part2/magnus/Debug /home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles/common.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/common.dir/depend
 

@@ -47,10 +47,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/magnus/SD/Superdata/part2/magnus
+CMAKE_SOURCE_DIR = /home/birkeland/havakv/Superdata/part2/magnus
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/magnus/SD/Superdata/part2/magnus/Debug
+CMAKE_BINARY_DIR = /home/birkeland/havakv/Superdata/part2/magnus/Debug
 
 #=============================================================================
 # Target rules for target CMakeFiles/common.dir
@@ -60,7 +60,7 @@ CMakeFiles/common.dir/all:
 	$(MAKE) -f CMakeFiles/common.dir/build.make CMakeFiles/common.dir/depend
 	$(MAKE) -f CMakeFiles/common.dir/build.make CMakeFiles/common.dir/requires
 	$(MAKE) -f CMakeFiles/common.dir/build.make CMakeFiles/common.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles  1
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles  1
 	@echo "Built target common"
 .PHONY : CMakeFiles/common.dir/all
 
@@ -70,9 +70,9 @@ all: CMakeFiles/common.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/common.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles 1
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/common.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles 0
 .PHONY : CMakeFiles/common.dir/rule
 
 # Convenience name for target.
@@ -95,7 +95,7 @@ clean: CMakeFiles/common.dir/clean
 CMakeFiles/poisson-mpi.dir/all: CMakeFiles/common.dir/all
 	$(MAKE) -f CMakeFiles/poisson-mpi.dir/build.make CMakeFiles/poisson-mpi.dir/depend
 	$(MAKE) -f CMakeFiles/poisson-mpi.dir/build.make CMakeFiles/poisson-mpi.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles  2
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles  2
 	@echo "Built target poisson-mpi"
 .PHONY : CMakeFiles/poisson-mpi.dir/all
 
@@ -105,9 +105,9 @@ all: CMakeFiles/poisson-mpi.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/poisson-mpi.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/poisson-mpi.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles 0
 .PHONY : CMakeFiles/poisson-mpi.dir/rule
 
 # Convenience name for target.

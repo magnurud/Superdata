@@ -103,6 +103,7 @@ int main(int argc, char **argv) {
     //-------------------------------
 
 
+//#pragma omp parallel for schedule(static)
     for (int j = 0; j < cols; ++j) {
         fst_(b.colFront(j), &n, &z.front(), &nn);
     }
@@ -114,6 +115,7 @@ int main(int argc, char **argv) {
     b.transpose();
     //sleep(10);
 
+//#pragma omp parallel for schedule(static)
     for (int i = 0; i < cols; ++i) {
         fstinv_(b.colFront(i), &n, &z.front(), &nn);
     }

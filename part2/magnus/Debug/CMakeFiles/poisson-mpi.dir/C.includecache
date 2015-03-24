@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/magnus/SD/Superdata/part2/magnus/poisson-mpi.c
+/home/birkeland/havakv/Superdata/part2/magnus/poisson-mpi.c
 stddef.h
 -
 stdlib.h
@@ -18,6 +18,8 @@ memory.h
 math.h
 -
 mpi.h
+-
+omp.h
 -
 
 /usr/lib/openmpi/include/mpi.h

@@ -35,10 +35,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/magnus/SD/Superdata/part2/magnus
+CMAKE_SOURCE_DIR = /home/birkeland/havakv/Superdata/part2/magnus
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/magnus/SD/Superdata/part2/magnus/Debug
+CMAKE_BINARY_DIR = /home/birkeland/havakv/Superdata/part2/magnus/Debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/poisson-mpi.dir/depend.make
@@ -51,17 +51,17 @@ include CMakeFiles/poisson-mpi.dir/flags.make
 
 CMakeFiles/poisson-mpi.dir/poisson-mpi.c.o: CMakeFiles/poisson-mpi.dir/flags.make
 CMakeFiles/poisson-mpi.dir/poisson-mpi.c.o: ../poisson-mpi.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/poisson-mpi.dir/poisson-mpi.c.o"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/poisson-mpi.dir/poisson-mpi.c.o   -c /home/magnus/SD/Superdata/part2/magnus/poisson-mpi.c
+	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/poisson-mpi.dir/poisson-mpi.c.o   -c /home/birkeland/havakv/Superdata/part2/magnus/poisson-mpi.c
 
 CMakeFiles/poisson-mpi.dir/poisson-mpi.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/poisson-mpi.dir/poisson-mpi.c.i"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /home/magnus/SD/Superdata/part2/magnus/poisson-mpi.c > CMakeFiles/poisson-mpi.dir/poisson-mpi.c.i
+	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /home/birkeland/havakv/Superdata/part2/magnus/poisson-mpi.c > CMakeFiles/poisson-mpi.dir/poisson-mpi.c.i
 
 CMakeFiles/poisson-mpi.dir/poisson-mpi.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/poisson-mpi.dir/poisson-mpi.c.s"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /home/magnus/SD/Superdata/part2/magnus/poisson-mpi.c -o CMakeFiles/poisson-mpi.dir/poisson-mpi.c.s
+	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /home/birkeland/havakv/Superdata/part2/magnus/poisson-mpi.c -o CMakeFiles/poisson-mpi.dir/poisson-mpi.c.s
 
 CMakeFiles/poisson-mpi.dir/poisson-mpi.c.o.requires:
 .PHONY : CMakeFiles/poisson-mpi.dir/poisson-mpi.c.o.requires
@@ -101,6 +101,6 @@ CMakeFiles/poisson-mpi.dir/clean:
 .PHONY : CMakeFiles/poisson-mpi.dir/clean
 
 CMakeFiles/poisson-mpi.dir/depend:
-	cd /home/magnus/SD/Superdata/part2/magnus/Debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/magnus/SD/Superdata/part2/magnus /home/magnus/SD/Superdata/part2/magnus /home/magnus/SD/Superdata/part2/magnus/Debug /home/magnus/SD/Superdata/part2/magnus/Debug /home/magnus/SD/Superdata/part2/magnus/Debug/CMakeFiles/poisson-mpi.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/birkeland/havakv/Superdata/part2/magnus/Debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/birkeland/havakv/Superdata/part2/magnus /home/birkeland/havakv/Superdata/part2/magnus /home/birkeland/havakv/Superdata/part2/magnus/Debug /home/birkeland/havakv/Superdata/part2/magnus/Debug /home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles/poisson-mpi.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/poisson-mpi.dir/depend
 
