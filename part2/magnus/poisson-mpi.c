@@ -173,6 +173,15 @@ for (i=0; i < nofC; i++) fstinv_(b[i], &n, z, &nn);
 if (rank == 0)
     printf("%f \n", WallTime()-startTime);
 
+		// Free memory //
+		free(diag);
+		free(z);
+			free(b[0]);
+		free(b);
+			free(bt[0]);
+		free(bt);
+		
+		
 MPI_Finalize();
 
 return 0;
