@@ -1,2 +1,0 @@
-/home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles/common.dir
-/home/birkeland/havakv/Superdata/part2/magnus/Debug/CMakeFiles/poisson-mpi.dir

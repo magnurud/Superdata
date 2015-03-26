@@ -30,6 +30,7 @@ void superTranspose(Real **b, Real **bt, int *sendcounts,int *sdispls,int rows,i
 void superTranspose2(Real **b, Real **bt, int *sendcounts,int size,int *sdispls,int rows,int cols);
 void printRow(Real *col,int rows); 
 Real sourceFunction(double x,double y);
+Real solution(double x,double y);
 
 double WallTime () {
 	return omp_get_wtime();
@@ -78,6 +79,7 @@ int main(int argc, char **argv ){
 
 	int sendcounts[size];
 	int sdispls[size];
+	int coldispls[size];
 	// setup topology
 
 	mpi_top_sizes[0] = 1; // Set number of processors in north-south direction
@@ -93,6 +95,7 @@ int main(int argc, char **argv ){
 	for(i = 0;i<size;i++){
 		sendcounts[i] = nofC; // a vector with the number of columns of each process
 		sdispls[i] = i*nofC;
+		coldispls[i] = i*nofC;
 	}
 	sendcounts[size-1]+=m%size; 
 	if (rank==size-1) nofC += m%size; // the last processor is distributed the remainding columns
@@ -108,19 +111,13 @@ int main(int argc, char **argv ){
 
 
 	// Distributing the eigenvalues //
-#pragma omp parallel for schedule(static)
-	for (i = 0; i<m; i++){
-		diag[i] = 2.*(1.-cos((i+1)*pi/(Real)n));}
-	/*diag[i] = i;} //for test reasons*/
-
-		// Distributing the function values//
 #pragma omp parallel for private(j) schedule(static)
-		for (i = 0; i<m; i++){ // rows
-			for (j = 0; j<nofC; j++){ //columns
-				/*b[j][i] = pow(h,2);}} // Need to add a function here!! */
-			b[j][i] = pow(h,2)*sourceFunction( (j+sdispls[rank]/nofC)*h , i*h);
-			}
-} 
+	for (i = 0; i<m; i++){
+		diag[i] = 2.*(1.-cos((i+1)*pi/(Real)n));
+		for (j = 0; j<nofC; j++){ //columns
+			b[j][i] = pow(h,2)*sourceFunction( (j+coldispls[rank]+1)*h , (i+1)*h);
+		}
+	} 
 /*b[j][i] =j*m+i+30*rank ;}} // for test-reasons!!! */
 
 
@@ -143,7 +140,7 @@ MPI_Alltoallv(bt[0], sendcounts,sdispls, MPI_DOUBLE,
 		b[0],	sendcounts, sdispls, MPI_DOUBLE,MPI_COMM_WORLD);
 
 // Super-Transposing locally !!! Now bt has the elements in right order, only needs to be transposed
-//superTranspose(b,bt, sendcounts,sdispls,m,nofC);
+/*superTranspose(b,bt, sendcounts,sdispls,m,nofC);*/
 superTranspose2(b,bt, sendcounts,size,sdispls,m,nofC);
 
 // Transposing locally in order to get the rows stored after each other in memory //
@@ -163,7 +160,7 @@ for (i=0; i < nofC; i++){
 #pragma omp parallel for private(j) schedule(static)
 for (i=0; i < m; i++) { // rows
 	for (j=0; j < nofC; j++) { //cols
-		b[j][i] = b[j][i]/(diag[i]+diag[j+sdispls[rank]/nofC]);
+		b[j][i] = b[j][i]/(diag[i]+diag[j+coldispls[rank]]);
 	}
 }
 
@@ -201,19 +198,20 @@ for (i=0; i < nofC; i++){
 
 // Now b contains the U matrix ! 
 if (rank == 0){
-	printf("%f \n", WallTime()-startTime);
+	printf("Total time : %f \n", WallTime()-startTime);
 }
 
 umax = 0.0;
 #pragma omp parallel for private(i) schedule(static)
 for (j=0; j < nofC; j++) {
 	for (i=0; i < m; i++) {
-		if (b[j][i] > umax) umax = b[j][i];
+		if (fabs(b[j][i]-solution( (j+coldispls[rank]+1)*h , (i+1)*h)) > umax){
+		 umax = fabs(b[j][i]-solution( (j+coldispls[rank]+1)*h , (i+1)*h)) ;
+		}
 	}
 }
 MPI_Reduce (&umax, &utotmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 if (rank == 0) printf (" umax = %e \n",utotmax);
-
 
 // Free memory //
 free(diag);
@@ -222,33 +220,8 @@ free(b);
 free(bt[0]);
 free(bt);
 
-
 MPI_Finalize();
-
 return 0;
-
-// PRINTING STUFF - Can be useful to get an idea of whats going on! //
-/*if(rank==3){*/
-/*printf("\n");*/
-/*printf("sendcounts: \n");*/
-/*for (i = 0; i<size; i++){*/
-/*printf(" %i ",sendcounts[i]);*/
-/*}*/
-/*printf("\n");*/
-/*printf("displacements: \n");*/
-/*for (i = 0; i<size; i++){*/
-/*printf(" %i ",sdispls[i]);*/
-/*}*/
-/*printf("\n");*/
-/*}*/
-
-/*printf (" rank = %i, coordinates = [%i,%i] \n",rank,mpi_top_coords[0],mpi_top_coords[1]);*/
-
-/*printf(" process number %i have %i columns ",rank,nofC);*/
-
-/*printf (" rank = %i, number of columns = %i \n",rank,nofC);*/
-
-/*printf (" rank = %i, start and end of columns = %i - %i \n",rank,disp,disp+nofC-1);*/
 }
 
 void transpose (Real **b, Real **bt, int rows,int cols)
@@ -316,8 +289,9 @@ void superTranspose(Real **b, Real **bt, int *sendcounts,int *sdispls,int rows,i
 void superTranspose2(Real **b, Real **bt, int *sendcounts,int size,int *sdispls,int rows,int cols){
 	int	i = 0; // the current sendpackage
 	int I = 0; // element-iteration
-#pragma omp parallel for private(I) schedule(static)
+/*#pragma omp parallel for private(I) schedule(static)*/
 	for (i = 0; i<size;i++){
+#pragma omp parallel for schedule(static)
 		for (I = 0; I<sendcounts[i]; I++){ // iterating over all the elements! 
 			//have to determine which send-package we're in! 
 			//some crazy ass numerating, but it works!!! 
@@ -335,5 +309,13 @@ void printRow(Real *col,int rows){
 }
 
 Real sourceFunction(double x,double y){
-	return x*y;
+	double pi   = 4.*atan(1.);
+	/*return sin(2*pi*x)*sin(pi*y);*/
+	return 5*pi*pi*sin(pi*x)*sin(2*pi*y);
+	/*return exp(x)*sin(2*pi*x)*sin(pi*y);*/
+	// Point charge alternative
+}
+Real solution(double x,double y){
+	double pi   = 4.*atan(1.);
+	return sin(pi*x)*sin(2*pi*y);
 }
