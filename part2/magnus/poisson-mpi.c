@@ -56,6 +56,7 @@ int main(int argc, char **argv ){
 
 	// Global variables //
 	n  = atoi(argv[1]); // nodes : 0,1,2....,n
+	n  = pow(2,n);
 	m  = n-1;	// number of internal nodes
 	nn = 4*n; // number of boundary nodes
 
@@ -311,9 +312,18 @@ void printRow(Real *col,int rows){
 Real sourceFunction(double x,double y){
 	double pi   = 4.*atan(1.);
 	/*return sin(2*pi*x)*sin(pi*y);*/
+	//
+	// For error testing START //
 	return 5*pi*pi*sin(pi*x)*sin(2*pi*y);
+	// For error testing END //
+	//
 	/*return exp(x)*sin(2*pi*x)*sin(pi*y);*/
-	// Point charge alternative
+
+	// Point charge alternative START //
+	/*if(x== 0.5 && y ==0.75) return 1;*/
+	/*else if(x== 0.5 && y ==0.25) return -1;*/
+	/*else return 0;*/
+	// Point charge alternative END //
 }
 Real solution(double x,double y){
 	double pi   = 4.*atan(1.);
