@@ -216,6 +216,12 @@ for (j=0; j < nofC; j++) {
 }
 MPI_Reduce (&umax, &utotmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 if (rank == 0) printf (" umax = %e \n",utotmax);
+// Printing //
+
+MPI_File fh;
+MPI_File_open(MPI_COMM_WORLD,"output",MPI_MODE_WRONLY|MPI_MODE_CREATE,MPI_INFO_NULL,&fh);
+MPI_File_write_at(fh,coldispls[rank]*m,b,nofC*m,MPI_DOUBLE,MPI_STATUS_IGNORE);
+MPI_File_close(&fh);
 
 // Free memory //
 free(diag);
