@@ -79,44 +79,6 @@ class Matrix {
      scalar getCols() {
          return m_cols;
      }
-
-     //// finds next index for "transpose"
-     //inline void nextIxTrans(size_t i, size_t j, size_t &ii, size_t &jj) {
-         //ii = m_cols*j + i/m_cols;
-         //jj = i % m_cols;
-     //}
-
-
-     //void mkTransposed() {
-         //if (order == RowMajor)
-             //exit(1);
-
-         //size_t ii, jj, kk, r0, c0, r1, c1, r2, c2;
-         //ii = 0;
-         //scalar tmp1, tmp2;
-         //for (size_t i = m_cols; i > 1; --i) {
-             //jj = ii-1;
-             //ii++;
-             //for (size_t j = 0; j < i; ++j) {
-                 //jj++;
-                 //kk = ii;
-                 //for (size_t k = 0; k < (i-1); ++k) {
-                     //// index = (kk + jj*m_cols, ii-1)
-                     //r0 = kk + jj*m_cols;
-                     //c0 = ii - 1;
-                     //nextIxTrans(r0, c0, r1, c1);
-                     //nextIxTrans(r1, c1, r2, c2);
-                     //tmp1 = (*this)(r1, c1);
-                     //tmp2 = (*this)(r2, c2);
-                     //(*this)(r1, c1) = (*this)(r0, c0);
-                     //(*this)(r2, c2) = tmp1;
-                     //(*this)(r0, c0) = tmp2;
-                     //kk++;
-                     ////cout << r0 << ", " << c0 << endl;
-                 //}
-             //}
-         //}
-     //}
 };
 
 
@@ -136,25 +98,20 @@ class MatrixMPI: public Matrix<scalar, order>{
      //! \brief Copy blocks from temp to this, and order by col instead of row
      //! \param temp Temporary MatrixMPI receive buffer
      //! \param senddisps Send displacements array (for MPI_Alltoallv)
-     void copyBlocksByRowToCol(MatrixMPI &temp, vector<int> senddisps){
-         size_t rowStart, nrRowsInBlock, rowNextStart, r, r2, c2;
+     void copyBlocksByRowToCol(MatrixMPI<double, RowMajor> &temp, vector<int> senddisps){
+         double *tempptr = temp.colFront(0);
+         //size_t tempit = 0;
+         //size_t rowStart, rowNextStart;
+         // iterate over block k
+#pragma omp parallel for schedule(static)
          for (size_t k = 0; k < m_commSize; ++k) {
-             rowStart      = senddisps[k];
-             nrRowsInBlock = m_cols_all[k];
-             rowNextStart  = rowStart + nrRowsInBlock;
-             r = rowStart;
-             r2 = r;
-             c2 = 0;
-             // iterate over rows (temp) in local block
-             for (size_t i = 0; i < m_cols_all[k]; ++i) { 
-                 // iterate over cols (temp) in block
-                 for (size_t c = 0; c < this->m_cols; ++c) {
-                     (*this)(r2,c2) = temp(r,c);
-                     r2++;
-                     c2 += r2 / (rowNextStart);
-                     r2 = (r2-rowStart) % nrRowsInBlock + rowStart;
+             size_t rowStart     = senddisps[k];
+             size_t rowNextStart = rowStart + m_cols_all[k];
+             size_t tempit       = this->m_cols * rowStart;
+             for (size_t c = 0; c < this->m_cols; ++c) {
+                 for (size_t r = rowStart; r < rowNextStart; ++r) {
+                     (*this)(r,c) = tempptr[tempit++];
                  }
-                 r++;
              }
          }
      }
@@ -191,7 +148,9 @@ class MatrixMPI: public Matrix<scalar, order>{
      //! \param j Local column number
      scalar* colFront(size_t col) {
          if (order == RowMajor) {
-             std::cout << "No implementation for RowMajor" << std::endl;
+             if (col == 0)
+                 return &this->m_data[0];
+             std::cout << "No implementation for RowMajor other than col = 0" << std::endl;
              exit(1);
          } 
          else
@@ -214,16 +173,23 @@ class MatrixMPI: public Matrix<scalar, order>{
          for (size_t i = 1; i < m_commSize; ++i) {
              senddisps[i] = senddisps[i-1] + sendcnts[i-1];
          }
-         MatrixMPI<double, ColMajor> temp(this->m_rows, m_comm);
+
+         // Receive data of type double 
+         vector<int> receivecnts(m_commSize);
+         for (size_t i = 0; i < m_commSize; ++i) {
+             receivecnts[i] = sendcnts[i]*this->m_cols;
+         }
+         vector<int> receivedisps(m_commSize, 0);
+         for (size_t i = 1; i < m_commSize; ++i) {
+             receivedisps[i] = receivedisps[i-1] + receivecnts[i-1];
+         }
+
+         MatrixMPI<double, RowMajor> temp(this->m_rows, m_comm);
          //cout << "Ready to send" << endl;
          MPI_Alltoallv(&this->m_data[0], &sendcnts.front(), 
-                 &senddisps.front(), locrow, &temp.m_data[0], 
-                 &sendcnts.front(), &senddisps.front(), locrow, m_comm);
+                 &senddisps.front(), locrow, temp.colFront(0), 
+                 &receivecnts.front(), &receivedisps.front(), MPI_DOUBLE, m_comm);
 
-         //cout << "Ready to reorder" << endl;
-         //if (m_commRank == 0) {
-             //temp.print();
-         //}
          // Reorder blocks to get transpose
          this->copyBlocksByRowToCol(temp, senddisps);
          //cout << "Done reordering" << endl;

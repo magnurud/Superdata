@@ -1,0 +1,2 @@
+/home/magnus/SD/Superdata/ex6/Debug/CMakeFiles/common.dir
+/home/magnus/SD/Superdata/ex6/Debug/CMakeFiles/poisson.dir

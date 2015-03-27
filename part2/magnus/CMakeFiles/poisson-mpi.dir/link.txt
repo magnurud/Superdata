@@ -1,0 +1,1 @@
+/usr/bin/c++    -std=c++11 -Wall -Wextra -pedantic    CMakeFiles/poisson-mpi.dir/poisson-mpi.cpp.o  -o poisson-mpi -rdynamic -lmpi_cxx -lmpi -ldl -lhwloc 
