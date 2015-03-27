@@ -17,6 +17,7 @@
 //#include <math.h>
 #include <cmath>
 #include <unistd.h>
+#include <fstream>
 #include "matrix.hh"
 using namespace std;
 
@@ -149,8 +150,63 @@ int main(int argc, char **argv) {
     if (rank == 0)
         cout << "Time: " << WallTime() - startTime << endl;
 
+    //if (m == 9 && size == 3) {
+        //// Write to file
+        //MPI_File fh;
+        //char fileName[] = "poisson.txt";
+        //MPI_File_open(WorldComm, fileName, MPI_MODE_WRONLY|MPI_MODE_CREATE,
+                //MPI_INFO_NULL, &fh);
+        //MPI_Offset mysize = m*cols;
+        ////MPI_File_set_view(f, 0 , MPI_DOUBLE, filetype, "native", MPI_INFO_NULL);
+        //MPI_File_write_at(fh, rank*mysize*sizeof(double),
+                //b.colFront(0), m*cols, MPI_DOUBLE, MPI_STATUS_IGNORE);
+        //MPI_File_close(&fh);
+    //}
+
+    // Write to file
+    //for (int i = 0; i < size; ++i) {
+        //if (rank == i) {
+            //if (rank == 0) {
+                //ofstream out("poisson.txt");
+                //if (out.fail()) {
+                    //cout << "Problems with: poisson.txt" << endl;
+                    //exit(1);
+                //}
+                //cout << rank << " inside" << endl;
+                //for (int k=0; k < cols; k++) {
+                    //for (int j=0; j < m; j++) {
+                        //out << b(j,k) << "\t";
+                    //}
+                    //out << endl;
+                //}
+                //out.close();
+                //cout << rank << " done" << endl;
+            //} else {
+                //ofstream out("poisson.txt", fstream::app);
+                //if (out.fail()) {
+                    //cout << "Problems with: poisson.txt" << endl;
+                    //exit(1);
+                //}
+                //cout << rank << " inside" << endl;
+                //for (int k=0; k < cols; k++) {
+                    //for (int j=0; j < m; j++) {
+                        //out << b(j,k) << "\t";
+                    //}
+                    //out << endl;
+                //}
+                //out.close();
+                //cout << rank << " done" << endl;
+            //}
+            //sleep(2);
+            //cout << rank << endl;
+            //MPI_Barrier(WorldComm);
+        //}
+    //}
+
+
+
     MPI_Comm_free(&WorldComm);
-	MPI_Finalize();
+    MPI_Finalize();
 
     return 0;
 }
