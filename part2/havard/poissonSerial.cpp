@@ -3,6 +3,7 @@
   a unit square using one-dimensional eigenvalue decompositions
   and fast sine transforms
 
+  Based on .c file by
   einar m. ronquist
   ntnu, october 2000
   revised, october 2001
@@ -13,7 +14,9 @@
 #include <stdio.h>
 #include <memory.h>
 #include <math.h>
+#include <fstream>
 #include "matrix.hh"
+using namespace std;
 
 typedef double Real;
 
@@ -98,8 +101,24 @@ int main(int argc, char **argv )
     }
   }
   printf (" umax = %e \n",umax);
-
   cout << "Time: " << WallTime() - startTime << endl;
+
+  // Write to file
+  ofstream out("poissonSerial.txt");
+  if (out.fail()) {
+      cout << "Problems with: poissonSerial.txt" << endl;
+      exit(1);
+  }
+  for (i=0; i < m; i++) {
+      for (j=0; j < m; j++) {
+          out << b[j][i] << "\t";
+      }
+      out << endl;
+  }
+
+
+
+
   return 0;
 }
 
