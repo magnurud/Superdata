@@ -84,20 +84,21 @@ int main(int argc, char **argv) {
         }
     }
 
+    // Allocate z for all openMP threads
+    double *z = new double[nn*omp_get_max_threads()];
+
 #pragma omp parallel for schedule(static)
     for (int j = 0; j < cols; ++j) {
-        double *z = new double[nn];
-        fst_(b.colFront(j), &n, z, &nn);
-        delete [] z;
+        int thread = omp_get_thread_num();
+        fst_(b.colFront(j), &n, &z[nn*thread], &nn);
     }
 
     b.transpose();
 
 #pragma omp parallel for schedule(static)
     for (int i = 0; i < cols; ++i) {
-        double *z = new double[nn];
-        fstinv_(b.colFront(i), &n, z, &nn);
-        delete [] z;
+        int thread = omp_get_thread_num();
+        fstinv_(b.colFront(i), &n, &z[nn*thread], &nn);
     }
     
 #pragma omp parallel for schedule(static)
@@ -109,19 +110,20 @@ int main(int argc, char **argv) {
 
 #pragma omp parallel for schedule(static)
     for (int i = 0; i < cols; ++i) {
-        double* z = new double[nn];
-        fst_(b.colFront(i), &n, z, &nn);
-        delete [] z;
+        int thread = omp_get_thread_num();
+        fst_(b.colFront(i), &n, &z[nn*thread], &nn);
     }
 
     b.transpose();
 
 #pragma omp parallel for schedule(static)
     for (int j = 0; j < cols; j++) {
-        double *z = new double[nn];
-        fstinv_(b.colFront(j), &n, z, &nn);
-        delete [] z;
+        int thread = omp_get_thread_num();
+        fstinv_(b.colFront(j), &n, &z[nn*thread], &nn);
     }
+    
+    delete [] z;
+    z = nullptr;
 
     if (rank == 0 && (prob == 0 || prob == 1))
         cout << "Time:\t" << WallTime() - startTime << endl;
