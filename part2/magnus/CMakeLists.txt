@@ -2,6 +2,13 @@ project(poisson-mpi)
 
 cmake_minimum_required(VERSION 2.6)
 
+add_subdirectory(../common common)
+
+add_definitions(${COMMON_DEFINITIONS})
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_C_FLAGS}")
+include_directories(${COMMON_INCLUDE_PATHS})
+
+
 # We use the C language
 enable_language(C)
 enable_language(Fortran)
@@ -33,46 +40,14 @@ endif()
 include_directories(${INCLUDES})
 
 # Add a library with common sources
-add_library(common fst.f)
+add_library(newcommon fst.f)
 
 # The C based poisson application
 add_executable(poisson-mpi poisson-mpi.c)
 
 # Link to libraries
-target_link_libraries(poisson-mpi common ${DEPLIBS_C})
+target_link_libraries(poisson-mpi newcommon ${DEPLIBS_C} ${COMMON_LIBRARIES})
 
 # We want to link this as a C program
 set_target_properties(poisson-mpi PROPERTIES LINKER_LANGUAGE C)
-
- ########################################### 
-#project(poisson-mpi) 
-
-#cmake_minimum_required(VERSION 2.8)
-
-#enable_language(CXX)
-#enable_language(Fortran)
-
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -pedantic")
-
-## MPI - stuff
-#find_package(MPI REQUIRED)
-#include_directories(${MPI_CXX_INCLUDE_PATH} ${MPI_Fortran_INCLUDE_PATH})
-
-## OpenMP - stuff
-#find_package(OpenMP)
-#add_definitions(-DHAVE_OPENMP=1)
-#set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-
-## Fortran stuff
-## Add a library with common sources
-## Add a library with common sources
-#add_library(common fst.f)
-#add_library(common fst.f)
-
-#add_definitions(${COMMON_DEFINITIONS})
-##---------------------------------------------------------------------
-#add_executable(poisson-mpi poisson-mpi.cpp)
-#target_link_libraries(poisson-mpi common ${MPI_CXX_LIBRARIES})
-
-
 

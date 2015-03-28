@@ -17,6 +17,7 @@
 #include <math.h>
 #include <mpi.h>
 #include <omp.h>
+#include "common.h"
 
 typedef double Real;
 
@@ -25,16 +26,16 @@ Real *createRealArray (int n);
 Real **createReal2DArray (int m, int n);
 void fst_(Real *v, int *n, Real *w, int *nn);
 void fstinv_(Real *v, int *n, Real *w, int *nn);
-void printMatrix(Real **b,int rows,int cols);
+void printMatrix2(Real **b,int rows,int cols);
 void superTranspose(Real **b, Real **bt, int *sendcounts,int *sdispls,int rows,int cols);
 void superTranspose2(Real **b, Real **bt, int *sendcounts,int size,int *sdispls,int rows,int cols);
 void printRow(Real *col,int rows); 
 Real sourceFunction(double x,double y);
 Real solution(double x,double y);
 
-double WallTime () {
-  return omp_get_wtime();
-}
+/*double WallTime () {*/
+  /*return omp_get_wtime();*/
+/*}*/
 
 
 int main(int argc, char **argv ){
@@ -48,11 +49,16 @@ int main(int argc, char **argv ){
     printf("need a problem size\n");
     return 1;
   }
+
   int n,m,nn; 
   Real *diag, **b, **bt, *z; 
   Real pi, h, umax,utotmax;
   int nofC,disp;
 
+  if( atoi(argv[1]) > 40 ) {
+    printf("get real! you are raising 2 to that number!!! \n");
+    return 1;
+  }
 
   // Global variables //
   n  = atoi(argv[1]); // nodes : 0,1,2....,n
@@ -74,6 +80,10 @@ int main(int argc, char **argv ){
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
+	MPI_Comm WorldComm;
+	MPI_Comm_dup(MPI_COMM_WORLD, &WorldComm);
+
+
   double startTime;
   if (rank == 0)
     startTime = WallTime();
@@ -86,10 +96,9 @@ int main(int argc, char **argv ){
   mpi_top_sizes[0] = 1; // Set number of processors in north-south direction
   mpi_top_sizes[1] = size; // Set number of processors in east-west direction
   int periodic[2] = {0, 0};
-  MPI_Comm comm;  
-  MPI_Cart_create(MPI_COMM_WORLD, 2, mpi_top_sizes, periodic, 0, &comm); //distributing the processors 
+  MPI_Cart_create(WorldComm, 2, mpi_top_sizes, periodic, 0, &WorldComm); //distributing the processors 
   //variables:  comunicator , #dims,dims, periodicity, reordering?, comm
-  MPI_Cart_coords(comm, rank, 2, mpi_top_coords); // making each processor aware of where they work
+  MPI_Cart_coords(WorldComm, rank, 2, mpi_top_coords); // making each processor aware of where they work
 
   nofC = m/size; // number of columns belonging to each processor 
   disp = nofC*rank; // the displacement of each processor
@@ -216,12 +225,70 @@ for (j=0; j < nofC; j++) {
 }
 MPI_Reduce (&umax, &utotmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 if (rank == 0) printf (" umax = %e \n",utotmax);
+//
 // Printing //
+//
+// The coward way // 
+//
+  int* size1;
+  int* displ1;
+  int* size2;
+  int* displ2;
+  splitVector(m, mpi_top_sizes[0], &size1, &displ1);
+  splitVector(m, mpi_top_sizes[1], &size2, &displ2);
 
-MPI_File fh;
-MPI_File_open(MPI_COMM_WORLD,"output",MPI_MODE_WRONLY|MPI_MODE_CREATE,MPI_INFO_NULL,&fh);
-MPI_File_write_at(fh,coldispls[rank]*m,b,nofC*m,MPI_DOUBLE,MPI_STATUS_IGNORE);
-MPI_File_close(&fh);
+  Matrix B = createMatrix(size1[mpi_top_coords[0]], size2[mpi_top_coords[1]]);
+  for (j=0;j<B->cols;++j)
+    for(i=0;i<B->rows;++i)
+      B->data[j][i] = b[j][i];
+  B->glob_rows = m;
+  B->glob_cols = m;
+  B->as_vec->comm = &WorldComm;
+
+  saveMatrixMPI(B, "meh.asc");
+
+  freeMatrix(B);
+// MY WAY - DOESNT WORK // 
+
+// ISSUE !! // 
+// WHAT SHOULD THE INPUT IN MPI_TYPE CONTIGOUS BE ??? //
+// Test-case //
+/*for (i=0; i < m; i++) { // rows*/
+	/*for (j=0; j < nofC; j++) { //cols*/
+		/*b[j][i] = i+(j+coldispls[rank])*m;*/
+	/*}*/
+/*}*/
+/*MPI_File fh;*/
+/*MPI_File_open(WorldComm,"output",MPI_MODE_WRONLY|MPI_MODE_CREATE,MPI_INFO_NULL,&fh);*/
+/*[>MPI_File_write_at(fh,coldispls[rank]*m,b,nofC*m,MPI_DOUBLE,MPI_STATUS_IGNORE);<]*/
+
+  /*MPI_Datatype filetype;*/
+  /*int gsizes[2], distribs[2], dargs[2];*/
+  /*gsizes[0] = m; gsizes[1] = m;*/
+  /*distribs[0] = MPI_DISTRIBUTE_BLOCK;*/
+  /*distribs[1] = MPI_DISTRIBUTE_BLOCK;*/
+  /*dargs[0] = dargs[1] = MPI_DISTRIBUTE_DFLT_DARG;*/
+  /*MPI_Datatype datatype;*/
+  /*MPI_Type_contiguous(13, MPI_CHAR, &datatype);*/
+  /*MPI_Type_commit(&datatype);*/
+  /*MPI_Type_create_darray(size,rank,2,gsizes,distribs,dargs,mpi_top_sizes,*/
+                         /*MPI_ORDER_FORTRAN,datatype,&filetype);*/
+  /*MPI_Type_commit(&filetype);*/
+  /*MPI_File_set_view(fh,0,datatype,filetype,"native",MPI_INFO_NULL);*/
+	/*printf("gsizes : %d , %d \n",gsizes[0],gsizes[1]);*/
+	/*printf("distribs: %d , %d\n",distribs[0],distribs[1]);*/
+	/*printf("dargs: %d , %d\n",dargs[0],dargs[1]);*/
+
+  /*[>int startcoord_x = displ1[coords[0]];<]*/
+  /*[>int startcoord_y = displ2[coords[1]];<]*/
+  /*for (j=0;j<nofC;++j) {*/
+    /*for (i=0;i<m;++i) {*/
+      /*char num[20];*/
+      /*sprintf(num,"%e ",b[j][i]);*/
+      /*MPI_File_write(fh,num,1,datatype,MPI_STATUS_IGNORE);*/
+    /*}*/
+  /*}*/
+/*MPI_File_close(&fh);*/
 
 // Free memory //
 free(diag);
@@ -272,7 +339,7 @@ Real **createReal2DArray (int n1, int n2)
   return (a);
 }
 
-void printMatrix(Real **b,int rows,int cols)
+void printMatrix2(Real **b,int rows,int cols)
 {
   int i,j;
   for(i = 0;i<rows;i++){
@@ -338,3 +405,4 @@ Real solution(double x,double y){
   double pi   = 4.*atan(1.);
   return sin(pi*x)*sin(2*pi*y);
 }
+
