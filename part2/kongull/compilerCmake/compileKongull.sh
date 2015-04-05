@@ -7,6 +7,6 @@ rm -rf Release
 mkdir Release
 cd Release
 
-CXX=icpc CC=icc FC=ifort cmake -DCMAKE_BUILD_TYPE=Release ../..
+CXX=icpc CC=icc FC=ifort cmake -DCMAKE_BUILD_TYPE=Release ..
 
 make

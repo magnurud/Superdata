@@ -2,7 +2,7 @@ project(poisson-mpi)
 
 cmake_minimum_required(VERSION 2.8)
 
-add_subdirectory(../common common)
+#add_subdirectory(../common common)
 
 add_definitions(${COMMON_DEFINITIONS})
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_C_FLAGS}")
