@@ -227,9 +227,50 @@ for (j=0; j < nofC; j++) {
 }
 MPI_Reduce (&umax, &utotmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 if (rank == 0) printf (" umax = %e \n",utotmax);
+
 //
 // Printing //
 //
+//
+// The super coward way... without using MPI at all...
+//
+Real *X    = createRealArray (nofC*m); // creating the coordinate vectors belonging to each processor
+Real *Y    = createRealArray (nofC*m); // creating the matrix belonging to each processor
+int count = 0;
+for (i = 0; i<m; i++){
+	for (j = 0; j<nofC; j++){ //columns
+		X[count] = (j+coldispls[rank]+1)*h ;
+		Y[count] = (i+1)*h;
+		count++;
+	}
+} 
+
+FILE *file,*fileX,*fileY;
+file = fopen("meh.asc","w");
+fileX = fopen("X.asc","w");
+fileY = fopen("Y.asc","w");
+count = 0;
+	for (j=0;j<nofC;++j) {
+		for (i=0;i<m;++i) {
+			char num[16];
+			sprintf(num,"%e  ",b[j][i]);
+			fwrite(num, sizeof(num[0]), 14, file );
+
+			sprintf(num,"%e ",X[count]);
+			fwrite(num, sizeof(num[0]), 13, fileX );
+
+			sprintf(num,"%e ",Y[count]);
+			fwrite(num, sizeof(num[0]), 13, fileY );
+			count++;
+		}
+	}
+
+fclose(file);
+fclose(fileX);
+fclose(fileY);
+
+free(X);
+free(Y);
 // The coward way, doesnt work... // 
 //
   /*int* size1;*/
