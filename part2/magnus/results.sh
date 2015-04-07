@@ -5,32 +5,22 @@
 
 #### TASK C ####
 rm -f taskc1.txt
-
-for i in 1 2 3 4 6 12
-do
-	j=$((12/$i))
-	qsub -v t=$i,ppn=$j,k=14,key=2,out=3,filename="taskc1.txt" job1.sh 
-done
-
-for i in 1 2 3 4 6 12
-do
-	j=$((12/$i))
-	qsub -v t=$i,ppn=$j,k=14,key=2,out=3,filename="taskc1.txt" job1.sh 
-done
-
-#### TASK C ####
 rm -f taskc3.txt
-
-for i in 1 2 3 4 6 12
+for i in {1..10}
 do
-	j=$((12/$i))
-	qsub -v t=$i,ppn=$j,k=14,key=2,out=3,filename="taskc3.txt" job3.sh 
-done
+	for i in 1 2 3 4 6 12
+	do
+		j=$((12/$i))
+		qsub -v t=$i,ppn=$j,k=14,key=2,out=3,filename="taskc1.txt" job1.sh 
+	done
 
-for i in 1 2 3 4 6 12
-do
-	j=$((12/$i))
-	qsub -v t=$i,ppn=$j,k=14,key=2,out=3,filename="taskc3.txt" job3.sh 
+	#### TASK C ####
+
+	for i in 1 2 3 4 6 12
+	do
+		j=$((12/$i))
+		qsub -v t=$i,ppn=$j,k=14,key=2,out=3,filename="taskc3.txt" job3.sh 
+	done
 done
 
 #### TASK B #### 
