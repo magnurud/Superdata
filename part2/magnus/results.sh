@@ -86,4 +86,22 @@ do
 	done
 done
 
+#----------------------------------------------------------------------------------------------
+# Convergence diagnostics
+
+rm -f convergence.txt
+
+for kk in {6..12}
+do
+	for j in 2
+	do
+		for i in 6 3 1
+		do
+			qsub -v t=$j,ppn=$i,k=${kk},key=2,out=3,filename="convergence.txt" job1.sh 
+		done
+	done
+done
+
+
+
 
