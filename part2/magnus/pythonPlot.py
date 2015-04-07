@@ -5,13 +5,14 @@ import matplotlib.pyplot as plt
 from scipy import linalg, optimize
 from sympy.mpmath import plot
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 
 #with open('meh.asc') as f:
-with open('output') as f:
+with open('Debug/meh.asc') as f:
 	a = f.readline().split()
-with open('X.asc') as f:
+with open('Debug/X.asc') as f:
 	b = f.readline().split()
-with open('Y.asc') as f:
+with open('Debug/Y.asc') as f:
 	c = f.readline().split()
         
 print float(c[3])
@@ -26,7 +27,7 @@ for i in range(len(a)):
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-ax.plot_trisurf(X, Y, U)
+ax.plot_trisurf(X, Y, U, cmap = cm.jet)
 
 plt.show()
 
