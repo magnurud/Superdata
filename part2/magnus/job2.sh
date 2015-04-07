@@ -35,4 +35,5 @@ module load openmpi/1.4.3-intel
 KMP_AFFINITY="granularity=fine,compact"
 
 # Run with 8 MPI processes, each with 3 threads
-OMP_NUM_THREADS=$t mpirun -npernode ${ppn}  Release/poisson-mpi ${k} ${key} ${out} >> ${filename} 
+OMP_NUM_THREADS=$t mpirun -npernode ${ppn}  Release/poisson-mpi ${k} ${key} ${out} >> ${filename}
+

@@ -36,6 +36,7 @@ Real sourceFunction(double x,double y,int key);
 Real solution(double x,double y);
 void saveMatrix1(Real **b,int cols,int rows,char *name,double h); // printing function for 1 processor! 
 void saveMatrix2(Real **b,char *name,int nofC,int m,double h,int rank,int size, int* coldispls,MPI_Comm WorldComm); // printing function for 1 processor! 
+void output(int outkey,double error, double time,int p ,int tpp,int points );
 
 double WallTime () {
 	return omp_get_wtime();
@@ -54,9 +55,9 @@ int main(int argc, char **argv ){
     return 1;
   }
 
-  int n,m,nn,key; 
+  int n,m,nn,key,out; 
   Real *diag, **b, **bt, *z; 
-  Real pi, h, umax,utotmax;
+  Real pi, h, error,errormax,time;
   int nofC,disp;
 
   if( atoi(argv[1]) > 20 ) {
@@ -87,10 +88,11 @@ int main(int argc, char **argv ){
 
   if( argc < 3 ) {
 		key = 2;
+		out = 3;
     if(!rank) printf("the source function is now automatically set to be the one used to test the error \n");
   }
 	else key  = atoi(argv[2]);  // the key to what problem to be used
-
+	if(argc==4) out = atoi(argv[3]);	
   double startTime;
   if (rank == 0)
     startTime = WallTime();
@@ -205,26 +207,24 @@ for (i=0; i < nofC; i++){
   free(z);
 }
 
-// Now b contains the U matrix ! 
-if (rank == 0){
-  printf("Total time : %f \n", WallTime()-startTime);
-}
+  time = WallTime()-startTime;
 
-umax = 0.0;
+error = 0.0;
 #pragma omp parallel for private(i) schedule(static)
 for (j=0; j < nofC; j++) {
   for (i=0; i < m; i++) {
-    if (fabs(b[j][i]-solution( (j+coldispls[rank]+1)*h , (i+1)*h)) > umax){
+    if (fabs(b[j][i]-solution( (j+coldispls[rank]+1)*h , (i+1)*h)) > error){
 #pragma omp critical
-      if (fabs(b[j][i]-solution( (j+coldispls[rank]+1)*h , (i+1)*h)) > umax){
-        umax = fabs(b[j][i]-solution( (j+coldispls[rank]+1)*h , (i+1)*h)) ;
+      if (fabs(b[j][i]-solution( (j+coldispls[rank]+1)*h , (i+1)*h)) > error){
+        error = fabs(b[j][i]-solution( (j+coldispls[rank]+1)*h , (i+1)*h)) ;
       }
     }
   }
 }
-MPI_Reduce (&umax, &utotmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
-if (rank == 0) printf (" umax = %e \n",utotmax);
+MPI_Reduce (&error, &errormax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
+// output for kongull 
+if(!rank) output(out,errormax,time,size,omp_get_max_threads(),m+1);
 //
 // Printing //
 //
@@ -477,4 +477,9 @@ MPI_File_close(&fY);
 free(X);
 free(Y);
 
+}
+void output(int outkey,double error, double time,int p ,int tpp,int points ){
+if(outkey == 1) printf("%d\t%d\t%d\t%f\n",p,tpp,points,time);
+if(outkey == 2) printf("%d\t%d\t%d\t%e\n",p,tpp,points,error);
+if(outkey == 3) printf("%d\t%d\t%d\t%f\t%e\n",p,tpp,points,time,error);
 }
