@@ -365,6 +365,7 @@ Real sourceFunction(double x,double y, int key){
 	else if(x== 0.5 && y ==0.25) return -1;
 	else return 0;
 	}
+	return 0;
   // Point charge alternative END //
 }
 Real solution(double x,double y){
