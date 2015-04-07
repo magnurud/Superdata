@@ -6,7 +6,8 @@ from scipy import linalg, optimize
 from sympy.mpmath import plot
 from mpl_toolkits.mplot3d import Axes3D
 
-with open('meh.asc') as f:
+#with open('meh.asc') as f:
+with open('output') as f:
 	a = f.readline().split()
 with open('X.asc') as f:
 	b = f.readline().split()
