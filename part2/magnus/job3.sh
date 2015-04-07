@@ -7,7 +7,7 @@
 #PBS -lnodes=3:ppn=12:default
 
 # Expect to run up to 5 minutes
-#PBS -lwalltime=00:01:00
+#PBS -lwalltime=00:03:00
 
 # Memory per process
 #PBS -lpmem=2000MB

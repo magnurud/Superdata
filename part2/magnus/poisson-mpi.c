@@ -214,7 +214,7 @@ error = 0.0;
 for (j=0; j < nofC; j++) {
   for (i=0; i < m; i++) {
     if (fabs(b[j][i]-solution( (j+coldispls[rank]+1)*h , (i+1)*h)) > error){
-#pragma omp critical
+	#pragma omp critical
       if (fabs(b[j][i]-solution( (j+coldispls[rank]+1)*h , (i+1)*h)) > error){
         error = fabs(b[j][i]-solution( (j+coldispls[rank]+1)*h , (i+1)*h)) ;
       }

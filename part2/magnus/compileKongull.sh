@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # For setting up and compiling Release version on kongull
 
+source environment.sh
 
 rm -rf Release
 mkdir Release
