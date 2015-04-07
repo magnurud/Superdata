@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    int n     = pow(2, atoi(argv[1]));
+    int n     = pow((double)2, atoi(argv[1]));
     int m     = n-1;
     int nn    = 4*n;
     int prob  = atoi(argv[2]);
