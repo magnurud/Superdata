@@ -5,6 +5,7 @@
 
 #### TASK C ####
 rm -f taskc1.txt
+rm -f taskc1NoMPI.txt
 rm -f taskc3.txt
 for i in {1..10}
 do

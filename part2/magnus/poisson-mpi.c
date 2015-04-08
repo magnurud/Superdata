@@ -230,18 +230,14 @@ for (j=0; j < nofC; j++) {
 MPI_Reduce (&error, &errormax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
 // output for kongull 
-<<<<<<< HEAD
-//if(!rank) output(out,errormax,time,size,omp_get_max_threads(),m+1);
-=======
 if(!rank) output(3,errormax,time,size,omp_get_max_threads(),m+1);
->>>>>>> 94491bc0e2ad56c90c6ac483a0821d6a635ee8d4
 //
 // Printing //
 //
 //
 // The super coward way... without using MPI at all...
 //
-saveMatrix1(b,nofC,m,"meh.asc",h);
+//saveMatrix1(b,nofC,m,"meh.asc",h);
 /*saveMatrix2(b,"meh.asc",nofC,m,h,rank,size,coldispls,WorldComm); // printing function for multiple processors! doesnt work ...  */
 
 // The coward way, doesnt work... // 
