@@ -27,9 +27,12 @@ off <- function(NOPRINT=FALSE){
 # One node
 x1 <-  read.table("./taskc1.txt")
 names(x1) <- c("nproc", "nthreads", "n", "time", "error")
+x1NoMPI <- read.table("./taskc1NoMPI.txt")
+names(x1NoMPI) <- names(x1)
 
 printfig("taskc1", NOPRINT=NOPRINT)
 plot(x1$nthreads, x1$time, xlab="threads", ylab="time")
+points(x1NoMPI$nthreads[x1NoMPI$nthreads==12], x1NoMPI$time[x1NoMPI$nthreads==12], pch = 3, col = 2)
 off(NOPRINT)
 
 
@@ -142,7 +145,8 @@ plotSpeedupVsThreadsTimesProc <- function(t1, ylim = NA, type = "speedup",
 }
 
 printfig("taskbSpeedupNodesTimesThreads", NOPRINT=NOPRINT)
-plotSpeedupVsThreadsTimesProc(t3, ylim = c(0, 25), vLines = c(12, 24))
+#plotSpeedupVsThreadsTimesProc(t3, ylim = c(0, 25), vLines = c(12, 24))
+plotSpeedupVsThreadsTimesProc(t3, ylim = c(0, 25))
 off(NOPRINT)
 
 #-------------------------
