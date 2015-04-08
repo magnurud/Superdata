@@ -91,7 +91,7 @@ done
 
 rm -f convergence.txt
 
-for kk in {6..12}
+for kk in {8..14}
 do
 	for j in 2
 	do

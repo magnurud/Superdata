@@ -3,10 +3,10 @@
 
 #---------------------------------------------------------------------------------------
 # Printing figures to file
-NOPRINT <- TRUE # Set to FALSE to print to files
-#NOPRINT <- FALSE # Set to FALSE to print to files
+#NOPRINT <- TRUE # Set to FALSE to print to files
+NOPRINT <- FALSE # Set to FALSE to print to files
 
-pathToFig <- "../Latex/figures/"
+pathToFig <- "../Latex/Figures/"
 printfig <- function(name, height = 6, pathFig = pathToFig, NOPRINT=FALSE){
     if (!NOPRINT){
         path <- paste(pathFig, name, '.pdf', sep = '')
@@ -49,47 +49,83 @@ t2 <- read.table("./taskbTIME2.txt")
 t3 <- read.table("./taskbTIME3.txt")
 names(t1) <- names(t2) <- names(t3) <- names(x1) 
 
-plotTimeVsProc <- function(t1){
+plotSpeedupVsProc <- function(t1, ylim = NA, efficiency = FALSE, vLines = NA){
     n <- unique(t1$n)
-    timelim <- c(min(t1$time), max(t1$time))
+    if (is.na(ylim[1])) {
+        if (efficiency)
+            ylim <- c(0, 1.2)
+        else
+            ylim <- c(0, max(t1$nproc))
+    }
 
     sub <- t1[t1$n == n[1], ]
-    plot(sub$nproc, sub$time, ylim=timelim, pch='+', xlab = "processes", ylab="time")
+    sub <- sub[order(sub$nproc),]
+    if (efficiency)
+        plot(sub$nproc, sub$time[1]/sub$time/sub$nproc, ylim=ylim, pch='+', xlab = "processes", ylab="efficiency")
+    else
+        plot(sub$nproc, sub$time[1]/sub$time, ylim=ylim, pch='+', xlab = "processes", ylab="speedup")
 
     for (i in 2:length(n)) {
         sub <- t1[t1$n == n[i], ]
-        points(sub$nproc, sub$time, col=i, pch='+')
+        sub <- sub[order(sub$nproc),]
+        if (efficiency)
+            points(sub$nproc, sub$time[1]/sub$time/sub$nproc, col=i, pch='+')
+        else
+            points(sub$nproc, sub$time[1]/sub$time, col=i, pch='+')
+            
     }
-    grid()
-    legend(x = "topright", as.character(n), pch = rep('+', length(n)),
+    if (efficiency)
+        abline(1, 0, lty=2)
+    else
+        abline(0, 1, lty=2)
+    if (!is.na(vLines[1])) {
+        for (i in vLines) 
+            abline(v=i, lty=3)
+    }
+    #grid()
+    legend(x = "topleft", as.character(n), pch = rep('+', length(n)),
            col = 1:3, bg = "white")
 }
 
 printfig("taskbTimeProc1", NOPRINT=NOPRINT)
-plotTimeVsProc(t1)
+plotSpeedupVsProc(t1, ylim = c(0, 30), vLines=c(12, 24))
 off(NOPRINT)
 printfig("taskbTimeProc2", NOPRINT=NOPRINT)
-plotTimeVsProc(t2)
+plotSpeedupVsProc(t2, ylim = c(0, 15), vLines=c(6, 12))
 off(NOPRINT)
 
-plotTimeVsThreadsTimesProc <- function(t1){
+plotSpeedupVsThreadsTimesProc <- function(t1, ylim = NA, vLines = NA){
     n <- unique(t1$n)
-    timelim <- c(min(t1$time), max(t1$time))
+    if (is.na(ylim[1]))
+        ylim <- c(0, max(t1$nproc*t1$nthreads))
 
     sub <- t1[t1$n == n[1], ]
-    plot(sub$nthreads*sub$nproc, sub$time, ylim=timelim, pch='+', xlab = "threads * processes", ylab="time")
+    sub <- sub[order(sub$nproc, sub$nthreads),]
+    plot(sub$nthreads*sub$nproc, sub$time[1]/sub$time, ylim=ylim, pch='+', xlab = "threads * nodes", ylab="speedup")
 
     for (i in 2:length(n)) {
         sub <- t1[t1$n == n[i], ]
-        points(sub$nthreads*sub$nproc, sub$time, col=i, pch='+')
+        sub <- sub[order(sub$nproc, sub$nthreads),]
+        points(sub$nthreads*sub$nproc, sub$time[1]/sub$time, col=i, pch='+')
     }
-    grid()
-    legend(x = "topright", as.character(n), pch = rep('+', length(n)),
+    abline(0, 1, lty=2)
+    #grid()
+    if (!is.na(vLines[1])) {
+        for (i in vLines) 
+            abline(v=i, lty=3)
+    }
+    legend(x = "topleft", as.character(n), pch = rep('+', length(n)),
            col = 1:3, bg = "white")
 }
 
 printfig("taskbTimeProcTimesThreads", NOPRINT=NOPRINT)
-plotTimeVsThreadsTimesProc(t3)
+plotSpeedupVsThreadsTimesProc(t3, ylim = c(0, 25), vLines = c(12, 24))
+off(NOPRINT)
+
+#-------------------------
+# Plotting speedup/(nproc) for 1 thread
+printfig("taskbTimeProc1Efficiency", NOPRINT=NOPRINT)
+plotSpeedupVsProc(t1, efficiency=TRUE, vLines=c(12, 24))
 off(NOPRINT)
 
 
@@ -101,5 +137,33 @@ conv <- read.table("./convergence.txt")
 names(conv) <- names(x1)
 
 # Plot with different types, + O , and so on, to distinguish between them
+nproc <- unique(conv$nproc)
+sub <- conv[conv$nproc == nproc[1],]
+plot(sub$n, sub$error, pch = 1, col = 1, log="xy", xlab="n", ylab="error")
+for (i in 2:length(nproc)) {
+    sub <- conv[conv$nproc == nproc[i],]
+    points(sub$n, sub$error, pch = i, col = i)
+}
+# Add line of slope -2
+abline(max(conv$error), -2)
 
+legend(x = "topright", as.character(nproc), pch = 1:length(nproc),
+           col = 1:length(nproc), bg = "white")
+
+
+
+# The rest of task d #-----------------------------------------------
+
+# Timing as function of n^2
+sub <- conv[conv$nproc == nproc[1],]
+plot(sub$n, sub$time/sub$n^2, pch = 1, col = 1, xlab="n", ylab="time/n^2", #log="xy",
+     )
+     #ylim = ylim)
+for (i in 2:length(nproc)) {
+    sub <- conv[conv$nproc == nproc[i],]
+    points(sub$n, sub$time/sub$n^2, pch = i, col = i)
+}
+grid()
+legend(x = "topright", as.character(nproc), pch = 1:length(nproc),
+           col = 1:length(nproc), bg = "white")
 
