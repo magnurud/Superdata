@@ -24,6 +24,7 @@
 typedef double Real;
 
 void transpose (Real **b, Real **bt, int rows,int cols);
+void setEqual (Real **b, Real **bt, int rows,int cols);
 Real *createRealArray (int n);
 Real **createReal2DArray (int m, int n);
 void fst_(Real *v, int *n, Real *w, int *nn);
@@ -49,6 +50,8 @@ int main(int argc, char **argv ){
   /* the total number of grid points in each spatial direction is (n+1) */
   /* the total number of degrees-of-freedom in each spatial direction is (n-1) */
   /* this version requires n to be a power of 2 */
+	/* the arguments should be the following: problem size , source function , output format*/
+	/*only problem size is necessarry */
 
   if( argc < 2 ) {
     printf("need a problem size\n");
@@ -114,10 +117,11 @@ int main(int argc, char **argv ){
     sdispls[i] *= nofC; // The displacement vector now contains the unique displacement of each data package.
     sendcounts[i] *= nofC; // the vector now contains the amount of data to be sent and recieved unique for each process!! 
   }
-
+	int thread = omp_get_max_threads();	
   b    = createReal2DArray (nofC,m); // creating the b-matrix belonging to each processor
   diag = createRealArray (m);    // creating the 
   bt   = createReal2DArray (m,nofC); //transposed b-matrix
+  z= createRealArray (nn*thread);
 
 
 
@@ -135,34 +139,35 @@ int main(int argc, char **argv ){
 // NOW WE ARE READY TO START THIS SHIT //
 
 // fast sine transform //
-#pragma omp parallel for schedule(static)
+#pragma omp parallel for private(thread) schedule(static)
 for (i = 0; i<nofC; i++){
-  Real *	z    = createRealArray (nn);
-  fst_(b[i], &n, z, &nn); 
-  free(z);
+  thread = omp_get_thread_num();
+  fst_(b[i], &n, &z[thread*nn], &nn); 
 }
-
 
 // Transposing locally before sending //
 transpose(b,bt,m,nofC);
 
-// sending using all_to_allv
-MPI_Alltoallv(bt[0], sendcounts,sdispls, MPI_DOUBLE, 
-    b[0],	sendcounts, sdispls, MPI_DOUBLE,MPI_COMM_WORLD);
+if(size>1){
 
-// Super-Transposing locally !!! Now bt has the elements in right order, only needs to be transposed
-/*superTranspose(b,bt, sendcounts,sdispls,m,nofC);*/
-superTranspose2(b,bt, sendcounts,size,sdispls,m,nofC);
+	// sending using all_to_allv
+	MPI_Alltoallv(bt[0], sendcounts,sdispls, MPI_DOUBLE, 
+			b[0],	sendcounts, sdispls, MPI_DOUBLE,MPI_COMM_WORLD);
 
-// Transposing locally in order to get the rows stored after each other in memory //
-transpose(bt,b,nofC,m);
+	// Super-Transposing locally !!! Now bt has the elements in right order, only needs to be transposed
+	/*superTranspose(b,bt, sendcounts,sdispls,m,nofC);*/
+	superTranspose2(b,bt, sendcounts,size,sdispls,m,nofC);
+
+	// Transposing locally in order to get the rows stored after each other in memory //
+	transpose(bt,b,nofC,m);
+}
+else setEqual(bt,b,m,m);
 
 // inverse fast sine transform //
-#pragma omp parallel for schedule(static)
+#pragma omp parallel for private(thread) schedule(static)
 for (i=0; i < nofC; i++){
-  Real *	z    = createRealArray (nn);
-  fstinv_(b[i], &n, z, &nn);
-  free(z);
+  thread = omp_get_thread_num();
+  fstinv_(b[i], &n, &z[thread*nn], &nn);
 }
 
 // b is now the G tilde matrix, check poisson-diag.pdf page 20 for references // 
@@ -178,33 +183,34 @@ for (i=0; i < m; i++) { // rows
 // Now the same procedure needs to be done for U tilde!
 
 // fast sine transform //
-#pragma omp parallel for schedule(static)
+#pragma omp parallel for private(thread) schedule(static)
 for (i = 0; i<nofC; i++){
-  Real *	z    = createRealArray (nn);
-  fst_(b[i], &n, z, &nn); 
-  free(z);
+  thread = omp_get_thread_num();
+  fst_(b[i], &n, &z[thread*nn], &nn); 
 }
 
 // Transposing locally before sending //
 transpose(b,bt,m,nofC);
 
-// sending using all_to_allv
-MPI_Alltoallv(bt[0], sendcounts,sdispls, MPI_DOUBLE, 
-    b[0],	sendcounts, sdispls, MPI_DOUBLE,MPI_COMM_WORLD);
+if(size>1){
+	// sending using all_to_allv
+	MPI_Alltoallv(bt[0], sendcounts,sdispls, MPI_DOUBLE, 
+			b[0],	sendcounts, sdispls, MPI_DOUBLE,MPI_COMM_WORLD);
 
-// Super-Transposing locally !!! //
-superTranspose2(b,bt, sendcounts,size,sdispls,m,nofC);
-/*superTranspose(b,bt, sendcounts,sdispls,m,nofC);*/
+	// Super-Transposing locally !!! //
+	superTranspose2(b,bt, sendcounts,size,sdispls,m,nofC);
+	/*superTranspose(b,bt, sendcounts,sdispls,m,nofC);*/
 
-// Transposing the bt matrix in order to get the rows stored after each other in memory //
-transpose(bt,b,nofC,m);
+	// Transposing the bt matrix in order to get the rows stored after each other in memory //
+	transpose(bt,b,nofC,m);
+}
+else setEqual(bt,b,m,m);
 
 // inverse fast sine transform //
-#pragma omp parallel for schedule(static)
+#pragma omp parallel for private(thread) schedule(static)
 for (i=0; i < nofC; i++){
-  Real *	z    = createRealArray (nn);
-  fstinv_(b[i], &n, z, &nn);
-  free(z);
+  thread = omp_get_thread_num();
+  fstinv_(b[i], &n, &z[thread*nn], &nn);
 }
 
   time = WallTime()-startTime;
@@ -261,6 +267,7 @@ free(b[0]);
 free(b);
 free(bt[0]);
 free(bt);
+free(z);
 
 MPI_Finalize();
 return 0;
@@ -270,11 +277,21 @@ void transpose (Real **b, Real **bt, int rows,int cols)
   //transpose from b to bt, rows and cols corresponds to b
 {
   int i, j;
-  // Get a segfault when this is added ... why //
 #pragma omp parallel for private(i) schedule(static)
   for (j=0; j < rows; j++) {
     for (i=0; i < cols; i++) {
       bt[j][i] = b[i][j];
+    }
+  }
+}
+
+void setEqual (Real **b, Real **bt, int rows,int cols)
+{
+  int i, j;
+#pragma omp parallel for private(i) schedule(static)
+  for (j=0; j < rows; j++) {
+    for (i=0; i < cols; i++) {
+      bt[j][i] = b[j][i];
     }
   }
 }
