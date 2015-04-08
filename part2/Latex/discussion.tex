@@ -53,3 +53,32 @@ now have different coefficients. This has to be done in step 2 of the algorithm,
 
 The last part of the algorithm would not need any further changing.
 
+%   //................//
+%  //    FIGURES     //
+% //''''''''''''''''//
+%
+\begin{figure}[h!]
+  \centering
+  \begin{subfigure}[b]{0.48\textwidth}
+     \includegraphics[width=\textwidth, trim={2.5cm 1.25cm 2.5cm 2cm}, clip]{./Figures/surfplot_key2_5.png}
+  \end{subfigure}%
+  \quad
+  \begin{subfigure}[b]{0.48\textwidth}
+    \includegraphics[width=\textwidth, trim={2.5cm 1.25cm 2.5cm 2cm}, clip]{./Figures/surfplot_key3_5.png}
+  \end{subfigure}
+  \quad
+  \begin{subfigure}[b]{0.48\textwidth}
+    \includegraphics[width=\textwidth, trim={2.5cm 2cm 2.5cm 2cm}, clip]{./Figures/surfplot_key4_5.png}
+  \end{subfigure}
+          %(or a blank line to force the subfigure onto a new line)
+  \vspace{1\baselineskip}
+  \caption{The obtained solutions to Poisson's equation using different source functions. The upper left, 
+     right and lower subfigure show the solutions for
+     %$f(x,y) = \sin ( 2 \! \pi \! x ) \sin ( \pi \! y )$,
+     $f(x,y) = 5 \pi^2 \sin (\pi \! x ) \sin (2 \! \pi \! y )$,
+     $f(x,y) = e^x \sin ( 2 \! \pi \! x )\sin ( \pi \! y )$ and a 
+     sink-source-function, respectively. 
+     }
+  \label{fig:time}
+\end{figure}
+%
