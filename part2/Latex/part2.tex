@@ -31,6 +31,17 @@
 \usepackage{subcaption}
 \usepackage[font={small, it}]{caption} % captions on figures and tables
 \usepackage{graphicx}
+\usepackage{color}
+\usepackage{hyperref} % Use \autoref{ and \nameref{
+\hypersetup{backref,
+  colorlinks=true,
+  breaklinks=true,
+  %hidelinks, %uncomment to make links black
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue
+}
+\usepackage[all]{hypcap} % Makes hyperref jup to top of pictures and tables
 % --------------------------------------------------------------------------------------
 
 \usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
@@ -84,6 +95,7 @@
 				  solution models have been implemented and compared}
 
 \input{problem.tex}
+\input{solution.tex}
 \input{kongull.tex}
 \input{results.tex}
 \input{analysis.tex}
