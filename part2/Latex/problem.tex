@@ -1,2 +1,28 @@
 \section{Problem Description}
 
+In this project the task is to solve the two-dimensional poisson problem as stated below.
+\begin{align}
+	-\nabla^2 u &= f  \text{ in } \Omega = (0,1)\times(0,1) \\
+	u &=  0 \text{ on } \partial \Omega
+\end{align}
+
+The problem is solved using a fast diagonalization method. The derivation of the method can be found in  REFERENCE TO POISSONDIAG, 
+and the method can be summed up into the following three steps:
+
+
+\begin{description}
+	\item[step 1  -  $O(n^2\log(n))$] \hfill \\ \hfill \\
+		Compute $\underline{\tilde{G}} = \underline{Q}^T\underline{G} \; \underline{Q} $    -    two matrix-matrix products 
+		\hfill \\
+	\item[step 2  -  $O(n^2)$] \hfill \\ \hfill \\
+		Compute $\tilde{u}_{i,j} = \frac{\tilde{g}_{i,j}}{\lambda_i+\lambda_j}$    -    scalar addition and divition
+		\hfill \\
+	\item[step 3  -  $O(n^2log(n))$] \hfill \\ \hfill \\
+		Compute $\underline{U} = \underline{Q}\underline{\tilde{U}} \; \underline{Q}^T $    -     two matrix-matrix products 
+\end{description}
+
+In this scheme the functions $u$ and $h^2 f$ are discretized as the matrices $\underline{U}$ and $\underline{G}$. 
+$\underline{Q}$ and $\underline{\Lambda}$ contains the eigenvectors and the eigenvalues of the discrete 
+second order partial differential operator. 
+
+Step 1 and 3 are solved using the infamous fast sine transform.
