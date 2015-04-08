@@ -148,7 +148,7 @@ for (i = 0; i<nofC; i++){
 // Transposing locally before sending //
 transpose(b,bt,m,nofC);
 
-if(size>1){
+if(size>1 || out == 3){
 
 	// sending using all_to_allv
 	MPI_Alltoallv(bt[0], sendcounts,sdispls, MPI_DOUBLE, 
@@ -230,7 +230,11 @@ for (j=0; j < nofC; j++) {
 MPI_Reduce (&error, &errormax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
 
 // output for kongull 
+<<<<<<< HEAD
 //if(!rank) output(out,errormax,time,size,omp_get_max_threads(),m+1);
+=======
+if(!rank) output(3,errormax,time,size,omp_get_max_threads(),m+1);
+>>>>>>> 94491bc0e2ad56c90c6ac483a0821d6a635ee8d4
 //
 // Printing //
 //

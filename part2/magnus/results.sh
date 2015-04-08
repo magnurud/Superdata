@@ -12,6 +12,7 @@ do
 	do
 		j=$((12/$i))
 		qsub -v t=$i,ppn=$j,k=14,key=2,out=3,filename="taskc1.txt" job1.sh 
+		qsub -v t=$i,ppn=$j,k=14,key=2,out=0,filename="taskc1NoMPI.txt" job1.sh 
 	done
 
 	#### TASK C ####
