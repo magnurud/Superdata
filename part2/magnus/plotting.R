@@ -53,41 +53,65 @@ t3 <- read.table("./taskbTIME3.txt")
 names(t1) <- names(t2) <- names(t3) <- names(x1) 
 
 plotSpeedupVsProc <- function(t1, ylim = NA, type = "speedup", vLines = NA,
-                              legendLoc = "topleft"){
+                              legendLoc = "topleft", something = FALSE){
     n <- unique(t1$n)
     if (is.na(ylim[1])) {
-        if (type == "efficiency")
+        if (type == "efficiency") {
             ylim <- c(0, 1.2)
+        }
         else if (type == "time")
             ylim <- c(min(t1$time), max(t1$time))
         else
             ylim <- c(0, max(t1$nproc))
     }
 
+    if (something)
+        t1$nproc <- t1$nproc*t1$nthreads
     sub <- t1[t1$n == n[1], ]
     sub <- sub[order(sub$nproc),]
-    if (type == "efficiency")
-        plot(sub$nproc, sub$time[1]/sub$time/sub$nproc, ylim=ylim, pch='+', xlab = "processes", ylab="efficiency")
+    if (type == "efficiency") {
+        if (something)
+            plot(sub$nproc, sub$time[1]/sub$time/sub$nproc*2, ylim=ylim, pch='+', xlab = "processors", ylab="efficiency")
+        else
+            plot(sub$nproc, sub$time[1]/sub$time/sub$nproc, ylim=ylim, pch='+', xlab = "processors", ylab="efficiency")
+    }
     else if (type == "time")
-        plot(sub$nproc, sub$time, ylim=ylim, pch='+', xlab = "processes", ylab="time")
-    else
-        plot(sub$nproc, sub$time[1]/sub$time, ylim=ylim, pch='+', xlab = "processes", ylab="speedup")
+        plot(sub$nproc, sub$time, ylim=ylim, pch='+', xlab = "processors", ylab="time")
+    else {
+        if (something) 
+            plot(sub$nproc, sub$time[1]/sub$time*2, ylim=ylim, pch='+', xlab = "processors", ylab="speedup")
+        else
+            plot(sub$nproc, sub$time[1]/sub$time, ylim=ylim, pch='+', xlab = "processors", ylab="speedup")
+    }
 
     for (i in 2:length(n)) {
         sub <- t1[t1$n == n[i], ]
         sub <- sub[order(sub$nproc),]
-        if (type == "efficiency")
-            points(sub$nproc, sub$time[1]/sub$time/sub$nproc, col=i, pch='+')
+        if (type == "efficiency") {
+            if (something)
+                points(sub$nproc, sub$time[1]/sub$time/sub$nproc*2, col=i, pch='+')
+            else
+                points(sub$nproc, sub$time[1]/sub$time/sub$nproc, col=i, pch='+')
+        }
         else if (type == "time")
             points(sub$nproc, sub$time, col=i, pch='+')
-        else
-            points(sub$nproc, sub$time[1]/sub$time, col=i, pch='+')
+        else {
+            if (something) 
+                points(sub$nproc, sub$time[1]/sub$time*2, col=i, pch='+')
+            else
+                points(sub$nproc, sub$time[1]/sub$time, col=i, pch='+')
+        }
             
     }
-    if (type == "efficiency")
+    if (type == "efficiency") {
         abline(1, 0, lty=2)
-    else if (type == "speedup")
-        abline(0, 1, lty=2)
+    }
+    else if (type == "speedup") {
+        #if (something)
+            #abline(0, 0.5, lty=2)
+        #else
+            abline(0, 1, lty=2)
+    }
     else
         grid()
 
@@ -103,7 +127,7 @@ printfig("taskbSpeedupProc1", NOPRINT=NOPRINT)
 plotSpeedupVsProc(t1, ylim = c(0, 30), vLines=c(12, 24))
 off(NOPRINT)
 printfig("taskbSpeedupProc2", NOPRINT=NOPRINT)
-plotSpeedupVsProc(t2, ylim = c(0, 15), vLines=c(6, 12))
+plotSpeedupVsProc(t2, ylim = c(0, 30), vLines=c(12, 24), something = TRUE)
 off(NOPRINT)
 
 plotSpeedupVsThreadsTimesProc <- function(t1, ylim = NA, type = "speedup", 
@@ -119,9 +143,9 @@ plotSpeedupVsThreadsTimesProc <- function(t1, ylim = NA, type = "speedup",
     sub <- t1[t1$n == n[1], ]
     sub <- sub[order(sub$nproc, sub$nthreads),]
     if (type == "time")
-        plot(sub$nthreads*sub$nproc, sub$time, ylim=ylim, pch='+', xlab = "threads * nodes", ylab="time")
+        plot(sub$nthreads*sub$nproc, sub$time, ylim=ylim, pch='+', xlab = "processors", ylab="time")
     else
-        plot(sub$nthreads*sub$nproc, sub$time[1]/sub$time, ylim=ylim, pch='+', xlab = "threads * nodes", ylab="speedup")
+        plot(sub$nthreads*sub$nproc, sub$time[1]/sub$time, ylim=ylim, pch='+', xlab = "processors", ylab="speedup")
 
     for (i in 2:length(n)) {
         sub <- t1[t1$n == n[i], ]
@@ -155,7 +179,7 @@ printfig("taskbEfficiencyProc1", NOPRINT=NOPRINT)
 plotSpeedupVsProc(t1, type = "efficiency", vLines=c(12, 24), legendLoc = "bottomleft")
 off(NOPRINT)
 printfig("taskbEfficiencyProc2", NOPRINT=NOPRINT)
-plotSpeedupVsProc(t2, type = "efficiency", vLines=c(6, 12), legendLoc = "bottomleft")
+plotSpeedupVsProc(t2, type = "efficiency", vLines=c(12, 24), legendLoc = "bottomleft", something = TRUE)
 off(NOPRINT)
 
 #------------------------
@@ -165,7 +189,7 @@ printfig("taskbTimeProc1", NOPRINT=NOPRINT)
 plotSpeedupVsProc(t1, type = "time", legendLoc = "topright", vLines = c(12, 24))
 off(NOPRINT)
 printfig("taskbTimeProc2", NOPRINT=NOPRINT)
-plotSpeedupVsProc(t2, type = "time", legendLoc = "topright", vLines = c(6, 12))
+plotSpeedupVsProc(t2, type = "time", legendLoc = "topright", vLines = c(12, 24), something = TRUE)
 off(NOPRINT)
 printfig("taskbTimeNodesTimesThreads", NOPRINT=NOPRINT)
 plotSpeedupVsThreadsTimesProc(t3, type = "time", legendLoc = "topright")
