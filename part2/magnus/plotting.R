@@ -199,10 +199,10 @@ off(NOPRINT)
 
 # Timing as function of n^2
 sub <- conv[conv$nproc == nproc[1],]
+ylim <- c(min(conv$time/conv$n^2), max(conv$time/conv$n^2))
 printfig("timeOverN2Vsn", NOPRINT=NOPRINT)
-plot(sub$n, sub$time/sub$n^2, pch = 1, col = 1, xlab="n", ylab="time/n^2", #log="xy",
-     )
-     #ylim = ylim)
+plot(sub$n, sub$time/sub$n^2, pch = 1, col = 1, xlab="n", 
+     ylab="time/n^2", ylim = ylim)
 for (i in 2:length(nproc)) {
     sub <- conv[conv$nproc == nproc[i],]
     points(sub$n, sub$time/sub$n^2, pch = i, col = i)
@@ -212,3 +212,18 @@ legend(x = "topright", as.character(nproc), pch = 1:length(nproc),
            col = 1:length(nproc), bg = "white")
 off(NOPRINT)
 
+# Timing as function of n^2
+sub <- conv[conv$nproc == nproc[1],]
+ylim <- c(min(conv$time/conv$n^2/log(conv$n)), 
+          max(conv$time/conv$n^2/log(conv$n)))
+printfig("timeOverN2LogNVsn", NOPRINT=NOPRINT)
+plot(sub$n, sub$time/sub$n^2/log(sub$n), pch = 1, col = 1, xlab="n", 
+     ylab="time/(n^2 log(n))", ylim = ylim)
+for (i in 2:length(nproc)) {
+    sub <- conv[conv$nproc == nproc[i],]
+    points(sub$n, sub$time/sub$n^2/log(sub$n), pch = i, col = i)
+}
+grid()
+legend(x = "topright", as.character(nproc), pch = 1:length(nproc),
+           col = 1:length(nproc), bg = "white")
+off(NOPRINT)
