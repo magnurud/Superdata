@@ -173,9 +173,9 @@ for (i=0; i < nofC; i++){
 // b is now the G tilde matrix, check poisson-diag.pdf page 20 for references // 
 
 // creating the U tilde TRANSPOSED matrix //
-#pragma omp parallel for private(j) schedule(static)
-for (i=0; i < m; i++) { // rows
-  for (j=0; j < nofC; j++) { //cols
+#pragma omp parallel for private(i) schedule(static)
+for (j=0; j < nofC; j++) { //cols
+  for (i=0; i < m; i++) { // rows
     b[j][i] = b[j][i]/(diag[i]+diag[j+coldispls[rank]]);
   }
 }
