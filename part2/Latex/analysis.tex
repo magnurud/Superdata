@@ -1,5 +1,27 @@
 \section{Analysis}
 
+The time it will take to solve the problem with the implemented algorithm is of order $O(n^2\log(n))$.
+Notice that as the problem size increases $\log(n)$ will be very small compared to $n^2$. It is therefore expected to see
+the time increase almost as a function of $n^2$ for larger problem sizes.
+
+The speedup $S_p$ of a program using $P$ processes is given as $S_p=\frac{T_1}{T_p}$. 
+The theoretical upper bound of this value is the number and processes, and will often be much lower 
+due to necessary serial code and sending costs. In the code used in this project the serial part of the parallelized program is 
+very small, but the algorithm requires a lot of sending between processes. Since the kongull cluster is used one would expect 
+that the sending cost will increase drastically when the program is runned on two or more nodes. It is therefore expected that 
+the speedup between 12 and 14 processes will be very small since that is where kongull needs to use 2 nodes instead of just 1.
+
+Another interesting and similar variable to study is the efficiency $\eta = \frac{S_p}{P}$, which has a theoretical upper bound 1.
+The trend of this variable should be the same as the one observed in the speedup. 
+
+SOME INFO ON THE LINEAR NETWORK MODEL! 
+
+For larger problem sizes the overhead costs of creating and closing threads, sending procedures and general noise will have
+a smaller effect on the total time. One can therefore expect that both the speedup and the efficiency will show a slightly better
+trend for large problem sizes. 
+
+OBSERVED RESULTS HERE ??
+
 speedup calculations, theoretic and observed
 
 
