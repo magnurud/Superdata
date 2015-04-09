@@ -162,10 +162,10 @@ off(NOPRINT)
 # Timing 
 
 printfig("taskbTimeProc1", NOPRINT=NOPRINT)
-plotSpeedupVsProc(t1, type = "time", legendLoc = "topright")
+plotSpeedupVsProc(t1, type = "time", legendLoc = "topright", vLines = c(12, 24))
 off(NOPRINT)
 printfig("taskbTimeProc2", NOPRINT=NOPRINT)
-plotSpeedupVsProc(t2, type = "time", legendLoc = "topright")
+plotSpeedupVsProc(t2, type = "time", legendLoc = "topright", vLines = c(6, 12))
 off(NOPRINT)
 printfig("taskbTimeNodesTimesThreads", NOPRINT=NOPRINT)
 plotSpeedupVsThreadsTimesProc(t3, type = "time", legendLoc = "topright")

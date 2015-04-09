@@ -1,6 +1,16 @@
 \section{Results}
 %
-First it is important to verify that the code works correctly. This was done by comparing the results to an analytical solution and plotting the error for different problem sizes $n$. 
+First it is important to verify that the code works correctly. This was done by comparing the results to an analytical solution and plotting the error for different problem sizes $n$. The problem chosen for this task was 
+\begin{align}
+  \label{eq:conv} 
+  f = 5 \pi^2 \sin (\pi x) \sin (2 \pi y),
+\end{align}
+with the solution
+\begin{align}
+  u = \sin (\pi x) \sin (2 \pi y). 
+\end{align}
+The max norm was used to measure the error. The calculations were run with two threads on 1, 3 and 6 MPI processes, and the results can be found in Figure~\ref{fig:errVsn}. This plot is a log-log plot, with a reference line of slope $-2$. As the points follow the line, this means the method has quadratic converges. As the numerical scheme is a second order method, the figure confirms that our implementation is correct. For the rest of this section all tests are done with the $f$ in Eq.~\eqref{eq:conv}, unless specified otherwise.\\
+%
 \begin{figure}[h!]
 \begin{center}
     \includegraphics[scale=0.5]{./Figures/errVsn.pdf}
@@ -9,10 +19,12 @@ First it is important to verify that the code works correctly. This was done by 
 \label{fig:errVsn}
 \end{figure}
 %
-Firs the problem \colorbox{yellow}{what problem?} was run on a single node where all 12 processors were utilized. The point was to investigate the performance of using threads versus MPI processes. Thus the relation between threads $t$ and processes $p$ is $p t = 12$ or $p = 12/t$. The calculations were done with $n = 2^{14}$. 
+\\
+Next the problem was run on a single node where all 12 processors were utilized. The point was to investigate the performance of using threads versus MPI processes. Thus the relation between threads $t$ and processes $p$ is $p t = 12$ or $p = 12/t$. The calculations were done with $n = 2^{14} = 16384$. 
 The same problem was repeated on three nodes where all 12 processors were utilized in the same way as above. The results can be found in Figure~\ref{fig:taskc}. It is clear from both plots that it is preferable to use only MPI processes and no openMP. 
 
 While running only one MPI process and 12 threads on one node there is still some overhead from the MPI sending to itself and the work of reordering the data. Therefore the problem was solved on 12 threads without this overhead. The results are the red crosses in Figure~\ref{fig:taskc}. It is clear that it is a lot faster than with the MPI sending, but it is still slower than running with 12 MPI processes. 
+\\
 \begin{figure}[h!]
   \centering
   \begin{subfigure}[b]{0.48\textwidth}
@@ -27,24 +39,31 @@ While running only one MPI process and 12 threads on one node there is still som
   \caption{Times (in seconds) for running MPI processes vs threads with $n = 2^{14}$. The total number of processors used are 12 per node, so the number of processes per node is 12 - threads. The left figure is run on one node, while the right is run on three nodes. The red crosses are run without any MPI sending at all.}
   \label{fig:taskc}
 \end{figure}
-%
+\\
+Next timing results were obtained by running the problem on different number of processes with one thread. Here up to three nodes were used, and a new node was only used if when there were no more free processors in the previous nodes. This was done for different problem sizes and plotted in Figure~\ref{fig:time1}. Sending between processes on a node should be faster than sending between nodes. This trend is clear in the figure, as the first points after utilizing an extra node (after the vertical lines), clearly do not follow the trend of the previous points. In Figure~\ref{fig:time2}, the same experiment is done, but with two treads instead of one. So here only up to 6 MPI processes were used on each node. Although it is clear from Figure~\ref{fig:taskc} that this should be worse than only using MPI processes, it is hard to distinguish Figure~\ref{fig:time1} and Figure~\ref{fig:time2}. To investigate how the time changed with only using threads on each node, this was done 
 %
 \begin{figure}[h!]
   \centering
   \begin{subfigure}[b]{0.48\textwidth}
     \includegraphics[width=\textwidth]{./Figures/taskbTimeProc1.pdf}
+    \caption{}
+    \label{fig:time1}
   \end{subfigure}%
   \quad
   \begin{subfigure}[b]{0.48\textwidth}
     \includegraphics[width=\textwidth]{./Figures/taskbTimeProc2.pdf}
+    \caption{}
+    \label{fig:time2}
   \end{subfigure}
   \quad
   \begin{subfigure}[b]{0.48\textwidth}
     \includegraphics[width=\textwidth]{./Figures/taskbTimeNodesTimesThreads.pdf}
+    \caption{}
+    \label{fig:time3}
   \end{subfigure}
           %(or a blank line to force the subfigure onto a new line)
   \vspace{1\baselineskip}
-  \caption{Times for running problem with different amount of processes. In the upper left figure each process has one thread, while in the upper right, each process has two treads. The problem is run on as few nodes as possible, and the processes are identically distributed among the nodes. The problem size $n$ is specified in the plots. In the bottom figure only one MPI process is run per node. Between 1 and 12 threads are run on each node.}
+  \caption{Times for running problem with different amount of processes. In the upper left figure each process has one thread, while in the upper right, each process has two treads. The problem is run on as few nodes as possible, and the processes are identically distributed among the nodes. The problem size $n$ is specified in the plots. The vertical lines separate the domain to show when 1, 2 and three nodes are used. In the bottom figure only one MPI process is run per node. Between 1 and 12 threads are run on each node.}
   \label{fig:time}
 \end{figure}
 %
