@@ -16,6 +16,7 @@ The max norm was used to measure the error. The calculations were run with two t
 \begin{center}
     \includegraphics[scale=0.4]{./Figures/errVsn.pdf}
 \end{center}
+  \vspace{-1\baselineskip}
 \caption{Loglog plot of the error as function of $n$. A reference line with slpe $-2$ is drawn. The problem in run on two threads with the number of processes specified in the legend.}
 \label{fig:errVsn}
 \end{figure}
@@ -36,7 +37,7 @@ While running only one MPI process and 12 threads on one node there is still som
     \includegraphics[width=\textwidth]{./Figures/taskc2.pdf}
   \end{subfigure}
           %(or a blank line to force the subfigure onto a new line)
-  \vspace{1\baselineskip}
+  \vspace{-0.1\baselineskip}
   \caption{Times (in seconds) for running MPI processes vs threads with $n = 2^{14}$. The total number of processors used are 12 per node, so the number of processes per node is 12 - threads. The left figure is run on one node, while the right is run on three nodes. The red crosses are run without any MPI sending at all.}
   \label{fig:taskc}
 \end{figure}
@@ -63,7 +64,7 @@ Next timing results were obtained by running the problem on different number of 
     \label{fig:time3}
   \end{subfigure}
           %(or a blank line to force the subfigure onto a new line)
-  \vspace{1\baselineskip}
+  \vspace{-0.1\baselineskip}
   \caption{Times for running problem with different amount of processes. In the upper left figure each process has one thread, while in the upper right, each process has two treads. The problem is run on as few nodes as possible, and the processes are identically distributed among the nodes. The problem size $n$ is specified in the plots. The vertical lines separate the domain to show when 1, 2 and three nodes are used. In the bottom figure only one MPI process is run per node. Between 1 and 12 threads are run on each node.}
   \label{fig:Times}
 \end{figure}
@@ -84,7 +85,7 @@ While Figure~\ref{fig:Times} displays the times, it is hard see much from the pl
     \includegraphics[width=\textwidth]{./Figures/taskbSpeedupNodesTimesThreads.pdf}
   \end{subfigure}
           %(or a blank line to force the subfigure onto a new line)
-  \vspace{1\baselineskip}
+  \vspace{-0.1\baselineskip}
   \caption{Speedup for running problem with different amount of processes. In the upper left figure each process has one thread, while in the upper right, each process has two treads. The problem is run on as few nodes as possible, and the processes are identically distributed among the nodes. There are drawn vertical lines to show when a new node is utilized, and a line with slope 1. The problem size $n$ is specified in the plots. In the bottom figure only one MPI process is run per node. Between 1 and 12 threads are run on each node.}
   \label{fig:Speedup}
 \end{figure}
@@ -103,7 +104,7 @@ Another diagnostics tool is to divide the speedup by number of processes. This i
     \includegraphics[width=\textwidth]{./Figures/taskbEfficiencyProc2.pdf}
   \end{subfigure}
           %(or a blank line to force the subfigure onto a new line)
-  \vspace{1\baselineskip}
+  \vspace{-0.1\baselineskip}
   \caption{Efficiency for running problem with different amount of processes. In the upper left figure each process has one thread, while in the upper right, each process has two treads. The problem is run on as few nodes as possible, and the processes are identically distributed among the nodes. There are drawn vertical lines to show when a new node is utilized, and a horizontal line at 1. The problem size $n$ is specified in the plots. In the bottom figure only one MPI process is run per node. Between 1 and 12 threads are run on each node.}
   \label{fig:Efficiency}
 \end{figure}
@@ -120,7 +121,7 @@ The time of the algorithm should be of order $O(n^2 \log(n)$. To investigate how
     \includegraphics[width=\textwidth]{./Figures/timeOverN2LogNVsn.pdf}
   \end{subfigure}
           %(or a blank line to force the subfigure onto a new line)
-  \vspace{1\baselineskip}
+  \vspace{-0.1\baselineskip}
   \caption{Left plot is $Time/n^2$ as function of $n$. Illustrates how time scales with $n^2$. The right plot is $Time/(n^2 \log (n)$. The data is the same as in Figure~\ref{fig:errVsn}.}
   \label{fig:timeVsn}
 \end{figure}
