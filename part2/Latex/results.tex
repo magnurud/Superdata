@@ -101,6 +101,17 @@ While Figure~\ref{fig:Times} displays the times, it is hard to get a lot of info
 
 From this plot it is clear that the speedup is better for larger problem sizes. This makes sense as the overhead becomes less significant as the time increases. Also note that there are some noisy points, especially for the smallest problem size. This was addressed in the beginning of this section. What is clear here is that the noise has a higher impact on small problems as the time is shorter, which makes perfect sense. Also here it is clear that there are more overhead when problem is done on one more node (see points after vertical lines in upper left figure). After the last vertical line the time gets really small and the data gets quite noisy.
 The trend is nevertheless clear, an increasing amount of nodes decreases the speedup. \\
+\\
+When sending data between processes with MPI, the speedup is not expected to be 1. By using the \textit{linear network model} \eqref{eq:linNetMod}, a better estimate can be obtained (though still not very accurate).
+\begin{align}
+  \tau_s(b) &= \tau_c + \gamma b, \notag \\
+  \label{eq:linNetMod} 
+  T_p &= \frac{T_1}{p} + \tau_s \left(  8 \frac{n^2}{p}\right), \\
+  S_p &= \frac{T_1}{T_p}. \notag 
+\end{align}
+Here $\tau_s$ is the time to communicate $b$ bytes and $\tau_c$ is the latency of the network. In Figure~\ref{fig:Speedup}, the green line is from \eqref{eq:linNetMod}, with $\tau_c = 10^{-6}$ and $\gamma = 5 \cdot 10^{-9}$. The lines seems to be a good approximation for one node, but not for more than one. This makes sense as it takes longer time to send data between nodes than internally in a node.
+\\ \colorbox{yellow}{Might want to explain why we send everything once, instead of each column.}\\
+\colorbox{yellow}{I think the calculations might suggest to send one col at a time.}
 %
 \begin{figure}[h!]
   \centering
@@ -117,7 +128,7 @@ The trend is nevertheless clear, an increasing amount of nodes decreases the spe
   \end{subfigure}
           %(or a blank line to force the subfigure onto a new line)
   \vspace{-0.1\baselineskip}
-\caption{Speedup for running the problem with different amount of MPI processes. In the upper left figure each process has one thread. In the upper right figure each process has two threads. In the bottom figure only one MPI process is run per node and the number of threads varies between 1 and 12. The problem is run on as few nodes as possible, and the MPI processes are identically distributed among the nodes. There are drawn vertical lines to show when a new node is utilized, and a line with slope 1. The problem size $n$ is specified in the plots. }
+  \caption{Speedup for running the problem with different amount of MPI processes. In the upper left figure each process has one thread. In the upper right figure each process has two threads. In the bottom figure only one MPI process is run per node and the number of threads varies between 1 and 12. The problem is run on as few nodes as possible, and the MPI processes are identically distributed among the nodes. There are drawn vertical lines to show when a new node is utilized, and a line with slope 1. The green line is the expected speedup from the linear network model \eqref{eq:linNetMod} for $n = 4096$. The problem size $n$ is specified in the plots. }
   \label{fig:Speedup}
 \end{figure}
 %

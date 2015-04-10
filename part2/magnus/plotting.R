@@ -123,8 +123,24 @@ plotSpeedupVsProc <- function(t1, ylim = NA, type = "speedup", vLines = NA,
            col = 1:3, bg = "white")
 }
 
+addLinearNetworkModel <- function(t1) {
+    n   <- unique(t1$n)
+    sub <- t1[t1$n == n[3], ]
+    sub <- sub[order(sub$nproc),]
+
+    tauC  <- 1e-6
+    gamma <- 5e-9
+    tauS  <- tauC + gamma*8*n[3]^2/sub$nproc
+    Tlin  <- sub$time[3]/sub$nproc + tauS
+
+    lines(sub$nproc, sub$time[3]/Tlin, lty = 2, col = 3)
+}
+
+
+
 printfig("taskbSpeedupProc1", NOPRINT=NOPRINT)
 plotSpeedupVsProc(t1, ylim = c(0, 30), vLines=c(12, 24))
+addLinearNetworkModel(t1)
 off(NOPRINT)
 printfig("taskbSpeedupProc2", NOPRINT=NOPRINT)
 plotSpeedupVsProc(t2, ylim = c(0, 30), vLines=c(12, 24), something = TRUE)
