@@ -18,7 +18,8 @@ right hand side as well. This is implemented before the FST is done and does not
 
 \subsection{Variations in the loading function $f$}
 The loading function simply needs to be evaluated in all the grid points and multiplied by the steplength, before the 
-FST-procedure starts. The only thing that will differ from the serial code is the displacement each process have.
+FST-procedure starts. The only thing that will differ from the serial code is the displacement each MPI process have.
+In Figure~\ref{fig:f} three solututions to the poisson problem have been plotted, all with different loading functions. 
 
 \subsection{Variations in the domain $\Omega$}
 By defining the domain $\Omega = (0,L_x)\times(0,L_y)$ but keeping the same number of grid points in each direction 
@@ -36,21 +37,16 @@ The diagonalized matrix system will now end up looking as
 \begin{equation}
 	\left( \frac{1}{h_x^2}\underline{T} \; \underline{U}+\frac{1}{h_y^2}\underline{U}\; \underline{T} \right) _{i,j}=f_{i,j}
 \end{equation}
-
 By continuing the diagonalization procedure st. $\underline{T}=\underline{Q}\;\underline{\Lambda}\;\underline{Q}^T $
 and defining $\underline{\tilde{U}}= \underline{Q}^T\;\underline{U}\;\underline{Q}$ one is left with the matrix system 
-
 \begin{equation}
 	\frac{1}{h_x^2}\underline{\Lambda} \; \underline{\tilde{U}}+\frac{1}{h_y^2}\underline{\tilde{U}}\; \underline{\Lambda} =\underline{\tilde{F}}.
 \end{equation}
-
 Notice that the right hand side can not be initially multiplied with the steplength $h^2$ since the two terms on the left hand side
 now have different coefficients. This has to be done in step 2 of the algorithm, and would be implemented in the following way; 
-
 \begin{equation}
 	\tilde{u}_{i,j} = \frac{\tilde{f}_{i,j}}{\lambda_i/h_x+\lambda_j/h_y}.
 \end{equation}
-
 The last part of the algorithm would not need any further changing.
 
 %   //................//
@@ -79,6 +75,6 @@ The last part of the algorithm would not need any further changing.
      $f(x,y) = e^x \sin ( 2 \! \pi \! x )\sin ( \pi \! y )$ and a 
      sink-source-function, respectively. 
      }
-  \label{fig:time}
+  \label{fig:f}
 \end{figure}
 %
