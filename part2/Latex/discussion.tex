@@ -12,7 +12,7 @@ closest to the boundary are on the form
 	-\frac{\partial^2 u_{i,j}}{\partial x^2} = -\frac{u_{i-1,j}-2u_{i,j}}{h^2}
 \end{equation}
 The incrementations of $i,j$ will depend on which boundary the element is close to, but the form of the operator is nevertheless the same.
-The effect on equation REF MAIN MATRIX EQ is that the boundary element is added to the left side.
+The effect on equation~\ref{eq:Matrix} is that the boundary element is added to the left side.
 In the homogenous case this does not affect the numerical algorithm, but in the non-homogenous case the boundary value needs to be added to the 
 right hand side as well. This is implemented before the FST is done and does not have any impact on the parallel implementation. 
 

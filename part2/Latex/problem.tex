@@ -6,11 +6,15 @@ In this project the task is to solve the two-dimensional poisson problem as stat
 	u &=  0 \text{ on } \partial \Omega
 \end{align}
 
-The problem is solved using a fast diagonalization method. The derivation of the method can be found in  REFERENCE TO POISSONDIAG,
+The problem is solved using a fast diagonalization method. The derivation of the method can be found in \cite{poisson} ,
 and the system of equation to be solved can be written as 
 \begin{align}
-TU = U 	
+	\underline{T} \; \underline{U} + 	\underline{U} \; \underline{T} = \underline{G} 	
+	\label{eq:Matrix}
 \end{align}
+where $\underline{T}$ is the discrete second order partial differential operator in one direction, 
+$\underline{G}$ is the discrete loading function multiplied with the steplength squared $h^2$ and $\underline{U}$ is the discrete solution
+to the problem.
 and the method can be summed up into the following three steps:
 
 
@@ -25,7 +29,6 @@ and the method can be summed up into the following three steps:
 		Compute $\underline{U} = \underline{Q}\underline{\tilde{U}} \; \underline{Q}^T $    -     two matrix-matrix products 
 \end{description}
 
-In this scheme the functions $u$ and $h^2 f$ are discretized as the matrices $\underline{U}$ and $\underline{G}$. 
 $\underline{Q}$ and $\underline{\Lambda}$ contains the eigenvectors and the eigenvalues of the discrete 
 second order partial differential operator. 
 
