@@ -1,7 +1,5 @@
 \section{Discussion}
 
-\subsection{Bottlenecks}
-
 \subsection{The non-homogeneous case}
 If one were to solve the Poisson problem with non-homogeneous boundary conditions ie. $u = g(x) $ on $\partial \Omega$, 
 some minor modifications would have to be done. 
@@ -45,7 +43,7 @@ and defining $\underline{\tilde{U}}= \underline{Q}^T\;\underline{U}\;\underline{
 Notice that the right hand side can not be initially multiplied with the steplength $h^2$ since the two terms on the left hand side
 now have different coefficients. This has to be done in step 2 of the algorithm, and would be implemented in the following way; 
 \begin{equation}
-	\tilde{u}_{i,j} = \frac{\tilde{f}_{i,j}}{\lambda_i/h_x+\lambda_j/h_y}.
+	\tilde{u}_{i,j} = \frac{\tilde{f}_{i,j}}{\lambda_i/h_x^2+\lambda_j/h_y^2}.
 \end{equation}
 The last part of the algorithm would not need any further changing.
 
