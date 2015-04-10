@@ -81,7 +81,8 @@ In Figure~\ref{fig:time2}, the same experiment is done, but with two threads ins
 %
 \\
 \subsubsection{Time as a function of $n$}
-The time of the algorithm should be of order $O(n^2 \log(n))$. To investigate how the time scales with $n$, $time/n^2$ was plotted as a function of $n$. This is displayed in the left plot in Figure~\ref{fig:timeVsn}. The data used is the same as in Figure~\ref{fig:errVsn}. One can clearly see an upward trend for larger problem sizes due to the factor $log(n)$. Therefore $time/(n^2 \log(n))$ was also plotted in Figure~\ref{fig:timeVsn}. Here the ratio is constant and it can be concluded that the time is of order $O(n^2 \log(n))$. For small times, the overhead becomes significant, and that is probably why the first point is so much higher for 3 and 6 MPI processes. Notice also by studying the slopes in the left plot of figure~\ref{fig:timeVsn} that the impact of the factor $log(n)$ is really small.  
+The time of the algorithm should be of order $O(n^2 \log(n))$. To investigate how the time scales with $n$, $time/n^2$ was plotted as a function of $n$. This is displayed in the left plot in Figure~\ref{fig:timeVsn}. The data used is the same as in Figure~\ref{fig:errVsn}. One can clearly see an upward trend for larger problem sizes due to the factor $log(n)$. Therefore $time/(n^2 \log(n))$ was also plotted in Figure~\ref{fig:timeVsn}. Here the ratio is constant and it can be concluded that the time is of order $O(n^2 \log(n))$. For small times, the overhead becomes significant, and that is probably why the first point is so much higher for 3 and 6 MPI processes. 
+%Notice also by studying the slopes in the left plot of figure~\ref{fig:timeVsn} that the impact of the factor $log(n)$ is really small.  
 \begin{figure}[h!]
   \centering
   \begin{subfigure}[b]{0.48\textwidth}
