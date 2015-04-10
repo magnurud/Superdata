@@ -1,17 +1,15 @@
 \section{Description of kongull cluster}
 The Kongull cluster is a CentOS 5.3 linux cluster. It has 113 physical nodes, 
-where 1 is used for login and 4 is for used for I/O. The remaining 108 nodes are 
+where 1 is used for login and 4 is used for I/O. The remaining 108 nodes are 
 used for computing. The nodes are equipped with 2$\times$ 6-core 2.4 GHz processors, with 6$\times$ 512KiB 
-(1 kibibyte = 1024 byte) L1-cache and a common 6 MiB (1 meibyte = $1024^2$ bytes) L3-cache.
+(1 kibibyte = 1024 byte) L1-cache and a common 6 MiB (1 mebibyte = $1024^2$ bytes) L3-cache.
 The compute nodes are spread out on 4 racks, 
 (rack 0: 40 nodes, rack 2: 40 nodes, rack 1: 16 nodes; rack 3: 12 nodes) 
-where the first 3 hold the HP AMP Opteron based nodes (2400 GHz core speed) 
+where the first 3 hold the HP AMP Opteron based nodes (2.4 GHz core speed) 
 %\todo{clock speed?}
 , while the last rack 
-(rack 3) holds the new Dell intel based nodes (2$\times$ 2.60 GHz 8-core processors). In total 1344 compute nodes. The network layout is a ''Fat Tree'', which is a tree shaped network where the processors
+(rack 3) holds the new Dell intel based nodes (2$\times$ 2.60 GHz 8-core processors). In total 1344 compute nodes, with a ''Fat Tree'' network layout.
 %\todo{is this okay? do i need a reference? https://www.hpc.ntnu.no/display/hpc/Kongull+Hardware }
-are connected to the bottom layer (''outer branches'') and where the number of links the on each branch
-increase the further up you go (the branches ''get fatter'').
 
 % FAT TREE REF:  http://clusterdesign.org/fat-trees/
 % KONGULL REF: http://clusterdesign.org/fat-trees/
