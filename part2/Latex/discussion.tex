@@ -2,24 +2,24 @@
 
 \subsection{Bottlenecks}
 
-\subsection{The non-homogenous case}
-If one were to solve the Poisson problem with non-homogenous boundary conditions ie. $u = g(x) $ on $\partial \Omega$, 
+\subsection{The non-homogeneous case}
+If one were to solve the Poisson problem with non-homogeneous boundary conditions ie. $u = g(x) $ on $\partial \Omega$, 
 some minor modifications would have to be done. 
 The matrix system that is generated through this algorithm does not include the effect of the boundary elements, 
-and in practice this is the same as assuming that they are iqual zero. The second order differential operator on the elements 
+and in practice this is the same as assuming that they are equal zero. The second order differential operator on the elements 
 closest to the boundary are on the form 
 \begin{equation}
 	-\frac{\partial^2 u_{i,j}}{\partial x^2} = -\frac{u_{i-1,j}-2u_{i,j}}{h^2}
 \end{equation}
 The incrementations of $i,j$ will depend on which boundary the element is close to, but the form of the operator is nevertheless the same.
 The effect on equation~\ref{eq:Matrix} is that the boundary element is added to the left side.
-In the homogenous case this does not affect the numerical algorithm, but in the non-homogenous case the boundary value needs to be added to the 
+In the homogeneous case this does not affect the numerical algorithm, but in the non-homogeneous case the boundary value needs to be added to the 
 right hand side as well. This is implemented before the FST is done and does not have any impact on the parallel implementation. 
 
 \subsection{Variations in the loading function $f$}
 The loading function simply needs to be evaluated in all the grid points and multiplied by the steplength, before the 
 FST-procedure starts. The only thing that will differ from the serial code is the displacement each MPI process have.
-In Figure~\ref{fig:f} three solututions to the poisson problem have been plotted, all with different loading functions. 
+In Figure~\ref{fig:f} three solutions to the poisson problem have been plotted, all with different loading functions. 
 
 \subsection{Variations in the domain $\Omega$}
 By defining the domain $\Omega = (0,L_x)\times(0,L_y)$ but keeping the same number of grid points in each direction 
